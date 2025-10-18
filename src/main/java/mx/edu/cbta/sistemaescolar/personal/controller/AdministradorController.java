@@ -1,10 +1,6 @@
 package mx.edu.cbta.sistemaescolar.personal.controller;
 
-import mx.edu.cbta.sistemaescolar.personal.dto.AdministradorDTO;
-import mx.edu.cbta.sistemaescolar.personal.dto.PermisoDTO;
-import mx.edu.cbta.sistemaescolar.personal.model.Administrador;
 import mx.edu.cbta.sistemaescolar.personal.model.Permiso;
-import mx.edu.cbta.sistemaescolar.personal.service.AdministradorService;
 import mx.edu.cbta.sistemaescolar.personal.service.exception.AdministradorException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +13,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/administradores")
 public class AdministradorController {
+
+    /*
 
     private final AdministradorService administradorService;
 
@@ -97,4 +95,5 @@ public class AdministradorController {
                 permisosDTO
         ));
     }
+    */
 }

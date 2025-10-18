@@ -1,5 +1,6 @@
 package mx.edu.cbta.sistemaescolar.personal.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.Set;
@@ -13,11 +14,13 @@ public class Permiso {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "nombre", nullable = false, unique = true, length = 50)
     private String nombre;
 
+    @Column(name = "descripcion", nullable = false, length = 200)
     private String descripcion;
 
     @ManyToMany(mappedBy = "permisos")
-    private Set<Administrador> administradores;
+    @JsonIgnore
+    private Set<Rol> roles;
 }

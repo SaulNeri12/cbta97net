@@ -2,8 +2,7 @@ package mx.edu.cbta.sistemaescolar.personal.model;
 
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,5 +11,11 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "docentes")
 public class Docente extends Usuario {
-    // informacion importante del Docente
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "cedula_profesional", nullable = false, length = 10)
+    private String cedulaProfesional;
 }
