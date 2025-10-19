@@ -16,9 +16,8 @@ public class Clase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ... otras relaciones como Docente, Materia, Grupo, Aula ...
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "docente_curp", nullable = false)
+    @JoinColumn(name = "docente_id", nullable = false)
     private Docente docente;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,6 +27,10 @@ public class Clase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grupo_id", nullable = false)
     private Grupo grupo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aula_id", nullable = false)
+    private Aula aula;
 
     /**
      * Una clase puede tener múltiples bloques de horario (ej. Lunes 8-10 y Miércoles 8-10).

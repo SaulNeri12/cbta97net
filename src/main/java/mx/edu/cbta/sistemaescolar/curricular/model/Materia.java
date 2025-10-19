@@ -1,9 +1,12 @@
 package mx.edu.cbta.sistemaescolar.curricular.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import mx.edu.cbta.sistemaescolar.personal.model.Docente;
+
+import java.util.Set;
 
 @Data
 @Entity
@@ -28,4 +31,8 @@ public class Materia {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_propedeutica_id") // Clave foránea
     private AreaPropedeutica areaPropedeutica;
+
+    @ManyToMany(mappedBy = "materias")
+    @JsonIgnore
+    private Set<Docente> docentes;
 }
