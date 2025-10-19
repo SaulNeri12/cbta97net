@@ -58,14 +58,6 @@ public class MateriaController {
         return ResponseEntity.ok(materiasDTO);
     }
 
-    @GetMapping("/grado/{grado}")
-    public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorGrado(@PathVariable Grado grado) {
-        List<Materia> materias = materiaService.obtenerMateriasPorGrado(grado);
-        List<MateriaDTO> materiasDTO = materias.stream()
-                .map(materiaMapper::toDto)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(materiasDTO);
-    }
 
     @GetMapping("/grado/{grado}/carrera/{carreraTecnicaId}")
     public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorGradoYCarrera(
