@@ -13,5 +13,4 @@ public interface GrupoService {
     List<Grupo> obtenerGrupos();
     List<Grupo> obtenerGruposPorCicloEscolar(Long idCicloEscolar);
     //List<Grupo> listarGruposPorGradoCicloEscolar(Long idCicloEscolar, Grado grado);
-
 }

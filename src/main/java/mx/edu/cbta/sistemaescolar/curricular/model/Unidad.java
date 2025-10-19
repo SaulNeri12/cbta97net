@@ -1,8 +1,7 @@
-package mx.edu.cbta.sistemaescolar.academica.model;
+package mx.edu.cbta.sistemaescolar.curricular.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import mx.edu.cbta.sistemaescolar.curricular.model.Materia;
 
 @Data
 @Entity

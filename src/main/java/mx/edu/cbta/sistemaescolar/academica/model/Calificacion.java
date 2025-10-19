@@ -2,6 +2,7 @@ package mx.edu.cbta.sistemaescolar.academica.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import mx.edu.cbta.sistemaescolar.curricular.model.Unidad;
 
 @Data
 @Entity

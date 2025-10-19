@@ -2,6 +2,7 @@ package mx.edu.cbta.sistemaescolar.curricular.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import mx.edu.cbta.sistemaescolar.personal.model.Docente;
@@ -25,14 +26,18 @@ public class Materia {
     private Grado semestre;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "carrera_tecnica_id") // Clave foránea
+    @JoinColumn(name = "carrera_tecnica_id")
     private CarreraTecnica carreraTecnica;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "area_propedeutica_id") // Clave foránea
+    @JoinColumn(name = "area_propedeutica_id")
     private AreaPropedeutica areaPropedeutica;
 
     @ManyToMany(mappedBy = "materias")
     @JsonIgnore
     private Set<Docente> docentes;
+
+    @OneToMany(mappedBy = "materia", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Size(min = 1, message = "Una materia debe tener al menos una unidad.")
+    private Set<Unidad> unidades;
 }
