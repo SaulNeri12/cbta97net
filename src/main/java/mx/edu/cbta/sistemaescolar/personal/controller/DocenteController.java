@@ -26,27 +26,9 @@ public class DocenteController {
     @GetMapping("/materia/{materiaId}")
     public ResponseEntity<List<DocenteDTO>> obtenerDocentesPorMateria(@PathVariable Long materiaId) throws DocenteException {
         List<Docente> docentes = docenteService.obtenerDocentePorMateria(materiaId);
-        
-        // Debug: imprimir cuántos docentes se encontraron
-        System.out.println("Docentes encontrados: " + docentes.size());
-        
-        if (!docentes.isEmpty()) {
-            // Debug: verificar el primer docente
-            Docente primerDocente = docentes.get(0);
-            System.out.println("Primer docente - ID: " + primerDocente.getId());
-            System.out.println("Primer docente - Nombre: " + primerDocente.getNombre());
-            System.out.println("Primer docente - Materias: " + 
-                (primerDocente.getMaterias() != null ? primerDocente.getMaterias().size() : "null"));
-        }
-        
-        List<DocenteDTO> docentesDTO = docentes.stream()
-                .map(d -> {
-                    DocenteDTO dto = docenteMapper.toDto(d);
-                    System.out.println("DTO mapeado - ID: " + dto.getId() + ", Nombre: " + dto.getNombre());
-                    return dto;
-                })
+        List<DocenteDTO> docenteDTOs = docentes.stream()
+                .map(docenteMapper::toDto)
                 .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(docentesDTO);
+        return ResponseEntity.ok(docenteDTOs);
     }
 }
