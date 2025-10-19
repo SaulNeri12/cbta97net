@@ -7,6 +7,8 @@ import mx.edu.cbta.sistemaescolar.personal.service.exception.DocenteException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -82,11 +84,15 @@ public class DocenteServiceImpl implements DocenteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Docente> obtenerDocentePorMateria(Long materiaId) throws DocenteException {
         try {
-            return docenteRepository.findByMaterias_Id(materiaId);
+            List<Docente> docentes = docenteRepository.findByMateriasId(materiaId);
+            System.out.println("Total docentes encontrados: " + docentes.size());
+            return docentes;
         } catch (Exception e) {
-            throw new DocenteException("Error al buscar docentes para la materia con ID: " + materiaId);
+            e.printStackTrace();
+            throw new DocenteException("Error al buscar docentes para la materia con ID: " + materiaId + " - " + e.getMessage());
         }
     }
 }

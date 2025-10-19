@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AreaPropedeuticaRepository extends JpaRepository<AreaPropedeutica, Long> {
+	AreaPropedeutica findByNombre(String nombre);
 
 }

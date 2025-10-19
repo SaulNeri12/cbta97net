@@ -1,6 +1,4 @@
 package mx.edu.cbta.sistemaescolar.curricular.model;
-
-
 import jakarta.persistence.*;
 import lombok.Data;
 

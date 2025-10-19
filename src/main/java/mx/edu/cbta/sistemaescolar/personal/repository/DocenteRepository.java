@@ -2,17 +2,23 @@ package mx.edu.cbta.sistemaescolar.personal.repository;
 
 import mx.edu.cbta.sistemaescolar.personal.model.Docente;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 public interface DocenteRepository extends JpaRepository<Docente, Long> {
+
     /**
-     * Encuentra todos los docentes que están asociados a una materia específica.
-     * Spring Data JPA genera la consulta a través de la relación Docente -> materias.
-     * @param materiaId El ID de la materia.
-     * @return Una lista de docentes que imparten esa materia.
+     * Busca docentes asociados a una materia específica.
+     * Usa JOIN FETCH para cargar las relaciones necesarias de forma eficiente.
      */
-    List<Docente> findByMaterias_Id(Long materiaId);
+    @Query("SELECT DISTINCT d FROM Docente d " +
+           "LEFT JOIN FETCH d.roles " +
+           "JOIN d.materias m " +
+           "WHERE m.id = :materiaId")
+    List<Docente> findByMateriasId(@Param("materiaId") Long materiaId);
+
 }
