@@ -36,6 +36,9 @@ public class Usuario {
     @Column(name = "activo", nullable = false)
     private boolean activo = true;
 
+    @Column(name = "contrasena", nullable = false)
+    private String contrasena;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "usuarios_roles", // Nombre de la tabla de unión

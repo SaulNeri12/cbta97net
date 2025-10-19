@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface GrupoRepository extends JpaRepository<Grupo, Long> {
-    List<Grupo> findByCicloEscolar(Long idCicloEscolar);
+    List<Grupo> findByCicloEscolar_Id(Long idCicloEscolar);
 }

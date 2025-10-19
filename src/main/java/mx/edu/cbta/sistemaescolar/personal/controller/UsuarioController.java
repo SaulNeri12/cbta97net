@@ -1,18 +1,10 @@
 package mx.edu.cbta.sistemaescolar.personal.controller;
 
-import mx.edu.cbta.sistemaescolar.personal.model.Permiso;
-import mx.edu.cbta.sistemaescolar.personal.service.exception.AdministradorException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 @RestController
-@RequestMapping("/administradores")
-public class AdministradorController {
+@RequestMapping("/usuarios")
+public class UsuarioController {
 
     /*
 
