@@ -49,4 +49,9 @@ public class MateriaServiceImpl implements MateriaService {
     public List<Materia> obtenerMateriasPorGradoYCarrera(Grado grado, Long carreraTecnicaId) {
         return materiaRepository.findBySemestreAndCarreraTecnicaId(grado, carreraTecnicaId);
     }
+
+    @Override
+    public List<Materia> obtenerMateriasPorGradoYCarreraYArea(Grado grado, Long carreraTecnicaId, Long areaPropedeuticaId) {
+        return materiaRepository.findBySemestreAndCarreraTecnicaIdAndAreaPropedeuticaId(grado, carreraTecnicaId, areaPropedeuticaId);
+    }
 }

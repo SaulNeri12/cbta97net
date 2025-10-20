@@ -5,6 +5,8 @@ import mx.edu.cbta.sistemaescolar.curricular.repository.AreaPropedeuticaReposito
 import mx.edu.cbta.sistemaescolar.curricular.service.AreaPropedeuticaService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AreaPropedeuticaServiceImpl implements AreaPropedeuticaService {
 
@@ -18,5 +20,16 @@ public class AreaPropedeuticaServiceImpl implements AreaPropedeuticaService {
 	public AreaPropedeutica registrarAreaPropedeutica(AreaPropedeutica areaPropedeutica) {
 		areaPropedeuticaRepository.save(areaPropedeutica);
 		return areaPropedeutica;
+	}
+
+	@Override
+	public AreaPropedeutica obtenerAreaPropedeuticaPorId(Long id) {
+		// TODO: devolver excepciones
+		return this.areaPropedeuticaRepository.findById(id).orElse(null);
+	}
+
+	@Override
+	public List<AreaPropedeutica> obtenerAreasPropedeuticas() {
+		return this.areaPropedeuticaRepository.findAll();
 	}
 }

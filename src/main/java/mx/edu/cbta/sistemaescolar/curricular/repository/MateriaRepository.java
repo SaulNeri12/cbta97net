@@ -15,4 +15,6 @@ public interface MateriaRepository extends JpaRepository<Materia, Long> {
     List<Materia> findBySemestre(Grado semestre);
     
     List<Materia> findBySemestreAndCarreraTecnicaId(Grado semestre, Long carreraTecnicaId);
+
+    List<Materia> findBySemestreAndCarreraTecnicaIdAndAreaPropedeuticaId(Grado semestre, Long carreraTecnicaId, Long areaPropedeuticaId);
 }

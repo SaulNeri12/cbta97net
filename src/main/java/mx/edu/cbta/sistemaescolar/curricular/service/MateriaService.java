@@ -19,4 +19,6 @@ public interface MateriaService {
     List<Materia> obtenerMateriasPorGrado(Grado grado);
     
     List<Materia> obtenerMateriasPorGradoYCarrera(Grado grado, Long carreraTecnicaId);
+
+    List<Materia> obtenerMateriasPorGradoYCarreraYArea(Grado grado, Long carreraTecnicaId, Long areaPropedeuticaId);
 }
