@@ -6,4 +6,5 @@ import mx.edu.cbta.sistemaescolar.curricular.service.exception.CicloEscolarNoEnc
 
 public interface CicloEscolarService {
     CicloEscolar obtenerCicloEscolarActivo() throws CicloEscolarNoEncontradoException;
+    CicloEscolar obtenerCicloEscolarPorId(Long id) throws CicloEscolarNoEncontradoException;
 }

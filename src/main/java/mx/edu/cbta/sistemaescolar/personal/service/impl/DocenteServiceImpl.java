@@ -1,5 +1,10 @@
 package mx.edu.cbta.sistemaescolar.personal.service.impl;
 
+import mx.edu.cbta.sistemaescolar.academica.model.Clase;
+import mx.edu.cbta.sistemaescolar.academica.model.Horario;
+import mx.edu.cbta.sistemaescolar.curricular.model.CicloEscolar;
+import mx.edu.cbta.sistemaescolar.curricular.service.CicloEscolarService;
+import mx.edu.cbta.sistemaescolar.curricular.service.exception.CicloEscolarNoEncontradoException;
 import mx.edu.cbta.sistemaescolar.personal.model.Docente;
 import mx.edu.cbta.sistemaescolar.personal.repository.DocenteRepository;
 import mx.edu.cbta.sistemaescolar.personal.service.DocenteService;
@@ -10,15 +15,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class DocenteServiceImpl implements DocenteService {
 
-    private final DocenteRepository docenteRepository;
 
-    @Autowired
-    public DocenteServiceImpl(DocenteRepository docenteRepository) {
+    private DocenteRepository docenteRepository;
+    private CicloEscolarService cicloEscolarService;
+
+    public DocenteServiceImpl(DocenteRepository docenteRepository, CicloEscolarService cicloEscolarService) {
         this.docenteRepository = docenteRepository;
+        this.cicloEscolarService = cicloEscolarService;
     }
 
     @Override
@@ -34,6 +42,28 @@ public class DocenteServiceImpl implements DocenteService {
     public Docente obtenerDocentePorId(Long id) throws DocenteException {
         return docenteRepository.findById(id)
                 .orElseThrow(() -> new DocenteException("No se encontró el docente con el ID: " + id));
+    }
+
+    @Override
+    public boolean docenteDisponibleEnHorario(Long idDocente, Horario nuevoHorario) throws DocenteException {
+        Docente docente = obtenerDocentePorId(idDocente);
+
+        try {
+            cicloEscolarService.obtenerCicloEscolarActivo();
+        } catch (CicloEscolarNoEncontradoException e) {
+            throw new DocenteException("No se pudo verificar la disponibilidad del docente debido a que no hay un ciclo escolar vigente.");
+        }
+
+        Set<Clase> clasesDocente = docente.getClases();
+
+        if (clasesDocente.isEmpty()) {
+            return true;
+        }
+
+        // verifica si los horarios de las clases de los docentes no se empalman con el nuevo horario...
+        return docente.getClases().stream()
+                .flatMap(clase -> clase.getHorarios().stream())
+                .noneMatch(horario -> horario.seEmpalmaCon(nuevoHorario));
     }
 
 

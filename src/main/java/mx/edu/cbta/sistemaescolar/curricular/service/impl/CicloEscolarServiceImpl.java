@@ -22,4 +22,9 @@ public class CicloEscolarServiceImpl implements CicloEscolarService {
         return Optional.ofNullable(cicloEscolarRepository.obtenerCicloEscolarActivo(hoy))
                 .orElseThrow(() -> new CicloEscolarNoEncontradoException("No hay ciclo escolar vigente"));
     }
+
+    @Override
+    public CicloEscolar obtenerCicloEscolarPorId(Long id) throws CicloEscolarNoEncontradoException {
+        return this.cicloEscolarRepository.findById(id).orElseThrow(() -> new CicloEscolarNoEncontradoException("No se encontro el ciclo escolar."));
+    }
 }
