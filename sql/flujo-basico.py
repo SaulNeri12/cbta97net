@@ -3,158 +3,240 @@ import json
 
 URL_BASE = "http://localhost:8080"
 
+# --- Listas Globales ---
 SEMESTRES = [
-        "Primer_Semestre",
-        "Segundo_Semestre",
-        "Tercer_Semestre",
-        "Cuarto_Semestre",
-        "Quinto_Semestre",
-        "Sexto_Semestre"
+        "Primer_Semestre", "Segundo_Semestre", "Tercer_Semestre",
+        "Cuarto_Semestre", "Quinto_Semestre", "Sexto_Semestre"
 ]
-
 AREAS_PROPEDEUTICAS = []
 CARRERAS_TECNICAS   = []
 MATERIAS            = []
 DOCENTES            = []
+AULAS               = [] # <-- NUEVA LISTA
+CICLO_ESCOLAR_ACTIVO_ID = None 
 
+# --- URLs ---
 CICLOS_ESCOLARES_URL    = f"{URL_BASE}/ciclos-escolares"
 MATERIAS_URL            = f"{URL_BASE}/materias"
 AREAS_PROPEDEUTICAS_URL = f"{URL_BASE}/areas-propedeuticas"
 CARRERAS_URL            = f"{URL_BASE}/carreras-tecnicas"
 DOCENTES_URL            = f"{URL_BASE}/docentes"
+AULAS_URL               = f"{URL_BASE}/aulas" # <-- NUEVA URL
+GRUPOS_URL              = f"{URL_BASE}/grupos" # <-- NUEVA URL
+
+# --- Funciones para Mostrar ---
 
 def mostrar_semestres():
-    print("\n\n---[SEMESTRES]---")
-    i = 0
-    for sem in SEMESTRES:
+    print("\n--- SEMESTRES ---")
+    for i, sem in enumerate(SEMESTRES):
         print(f"{i}. {sem}")
-        i += 1
 
 def mostrar_carreras():
-    print("\n\n---[CARRERAS TECNICAS]---")
-    i = 0
-    for carrera in CARRERAS_TECNICAS:
-        print(f"{i}. {carrera["nombre"]}")
-        i += 1
+    print("\n--- CARRERAS TÉCNICAS ---")
+    for i, carrera in enumerate(CARRERAS_TECNICAS):
+        print(f"{i}. {carrera['nombre']}")
 
 def mostrar_areas():
-    print("\n\n---[AREAS PROPEDEUTICAS]---")
-    i = 0
-    for area in AREAS_PROPEDEUTICAS:
-        print(f"{i}. {area["nombre"]}")
-        i += 1
+    print("\n--- ÁREAS PROPEDÉUTICAS ---")
+    for i, area in enumerate(AREAS_PROPEDEUTICAS):
+        print(f"{i}. {area['nombre']}")
 
 def mostrar_materias():
-    print("\n\n---[MATERIAS]---")
-    i = 0
-    for mat in MATERIAS:
-        print(f"{i}. {mat["nombre"]}")
-        i += 1
+    print("\n--- MATERIAS DISPONIBLES ---")
+    if not MATERIAS:
+        print("No se encontraron materias.")
+        return
+    for i, mat in enumerate(MATERIAS):
+        print(f"{i}. {mat['nombre']}")
 
 def mostrar_docentes():
-    """Muestra la lista de docentes disponibles."""
-    print("\n\n---[DOCENTES QUE IMPARTEN LA MATERIA]---")
+    print("\n--- DOCENTES DISPONIBLES ---")
     if not DOCENTES:
-        print("No se encontraron docentes para la materia seleccionada.")
+        print("No se encontraron docentes.")
         return
-    i = 0
-    for docente in DOCENTES:
-        # Asumiendo que el DTO del docente tiene 'nombre' y 'apellidoPaterno'
+    for i, docente in enumerate(DOCENTES):
         nombre_completo = f"{docente.get('nombre', '')} {docente.get('apellidoPaterno', '')}"
         print(f"{i}. {nombre_completo.strip()}")
-        i += 1
 
+def mostrar_aulas(): # <-- NUEVA FUNCIÓN
+    """Muestra la lista de aulas disponibles."""
+    print("\n--- AULAS DISPONIBLES ---")
+    if not AULAS:
+        print("No se encontraron aulas.")
+        return
+    for i, aula in enumerate(AULAS):
+        print(f"{i}. {aula['clave']}")
+
+
+# --- Funciones para Obtener Datos (GET) ---
+
+def obtener_datos(url, lista_global, nombre_entidad):
+    """Función genérica para obtener datos de un endpoint."""
+    global AREAS_PROPEDEUTICAS, CARRERAS_TECNICAS, AULAS, DOCENTES
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        if nombre_entidad == "AREAS_PROPEDEUTICAS": AREAS_PROPEDEUTICAS = response.json()
+        elif nombre_entidad == "CARRERAS_TECNICAS": CARRERAS_TECNICAS = response.json()
+        elif nombre_entidad == "AULAS": AULAS = response.json()
+        elif nombre_entidad == "DOCENTES": DOCENTES = response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"[=!=] No se pudieron obtener las {nombre_entidad.lower()}: {e}")
+        exit(1)
 
 def obtener_materias(grado_idx=None, carrera_id=None, area_id=None):
-    """
-    Obtiene materias construyendo la URL con los filtros proporcionados.
-    Usa None para indicar que un filtro no debe aplicarse.
-    """
     global MATERIAS
+    # ... (Se mantiene la misma función de la pregunta anterior)
     url = MATERIAS_URL
-    
-    print()
-
     if grado_idx is not None and 0 <= grado_idx < len(SEMESTRES):
         url += f"/grado/{SEMESTRES[grado_idx]}"
-        
-        if carrera_id is not None and carrera_id > 0:
-            url += f"/carrera/{carrera_id}"
-            
-            if area_id is not None and area_id > 0:
-                url += f"/area/{area_id}"
-
-    elif area_id is not None and area_id > 0 and grado_idx is None and carrera_id is None:
-         url += f"/area/{area_id}"
-
+        if carrera_id is not None and carrera_id > 0: url += f"/carrera/{carrera_id}"
+        if area_id is not None and area_id > 0: url += f"/area/{area_id}"
+    elif area_id is not None and area_id > 0: url += f"/area/{area_id}"
     response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        MATERIAS = data
-    else:
-        print(f"[=!=] Error al obtener las materias. Código: {response.status_code}")
-        print(f"Respuesta: {response.text}") 
-        MATERIAS = [] 
+    MATERIAS = response.json() if response.status_code == 200 else []
 
-def obtener_docentes_por_materia(materia_id): # <-- NUEVA FUNCIÓN
-    """Obtiene los docentes calificados para impartir una materia específica."""
-    global DOCENTES
-    url = f"{DOCENTES_URL}/materia/{materia_id}"
+
+def obtener_ciclo_escolar_activo():
+    """Obtiene el ciclo escolar activo y almacena su ID globalmente."""
+    global CICLO_ESCOLAR_ACTIVO_ID
+    url = f"{CICLOS_ESCOLARES_URL}/activo"
+    print(f"Verificando ciclo escolar activo en: {url}")
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        ciclo = response.json()
+        CICLO_ESCOLAR_ACTIVO_ID = ciclo.get('id')
+        if CICLO_ESCOLAR_ACTIVO_ID:
+            print(f"--> Ciclo Escolar Activo encontrado. ID: {CICLO_ESCOLAR_ACTIVO_ID}")
+        else:
+            print("[=!=] No se encontró un ID en la respuesta del ciclo activo.")
+            exit(1)
+    except requests.exceptions.RequestException as e:
+        print(f"[=!=] ERROR: No se pudo obtener el ciclo escolar activo. {e}")
+        print("Asegúrate de que haya un ciclo activo en la base de datos y que el endpoint /ciclos-escolares/activo exista.")
+        exit(1)
+
+
+# --- NUEVA FUNCIÓN PARA CREAR Y ENVIAR GRUPO (POST) ---
+
+def crear_y_enviar_grupo():
+    """Función principal para construir el objeto Grupo y enviarlo al servidor."""
+    print("\n=====================================")
+    print("    CREACIÓN DE UN NUEVO GRUPO")
+    print("=====================================")
+
+    global CICLO_ESCOLAR_ACTIVO_ID
+    if CICLO_ESCOLAR_ACTIVO_ID == None:
+        print("[!] No hay ciclo escolar activo...")
+
+    # 1. Recopilar datos básicos del grupo
+    mostrar_semestres()
+    grado_idx = int(input("Selecciona el índice del semestre: "))
+    letra = input("Introduce la letra del grupo (ej. A, B): ").upper()
+    turno = input("Introduce el turno (MATUTINO o VESPERTINO): ").upper()
+    #ciclo_id = int(input("Introduce el ID del ciclo escolar: "))
+    nota = input("Añade una nota para el grupo: ")
     
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        DOCENTES = data
-    else:
-        print(f"[=!=] No se pudieron obtener los docentes. Código: {response.status_code}")
-        print(f"Respuesta del servidor: {response.text}")
-        DOCENTES = []
+    carrera_id = None
+    if grado_idx >= 2: # A partir de tercer semestre se elige carrera
+        mostrar_carreras()
+        carrera_idx = int(input("Selecciona el índice de la carrera técnica: "))
+        carrera_id = CARRERAS_TECNICAS[carrera_idx]['id']
 
-def obtener_areas_propedeuticas():
-    global AREAS_PROPEDEUTICAS
-    url = AREAS_PROPEDEUTICAS_URL
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        #print(data)
-        AREAS_PROPEDEUTICAS = data
-    else:
-        print("[=!=] No se pudieron obtener las areas propedeuticas.")
-        exit(1)
+    area_id = None
+    if grado_idx >= 4: # A partir de quinto semestre se elige área
+        mostrar_areas()
+        area_idx = int(input("Selecciona el índice del área propedéutica: "))
+        area_id = AREAS_PROPEDEUTICAS[area_idx]['id']
 
-def obtener_carreras_tecnicas():
-    global CARRERAS_TECNICAS
-    url = CARRERAS_URL
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        #print(data)
-        CARRERAS_TECNICAS = data
-    else:
-        print("[=!=] No se pudieron obtener las carreras tecnicas.")
-        exit(1)
-
-
-obtener_areas_propedeuticas()
-obtener_carreras_tecnicas();
-
-mostrar_semestres()
-mostrar_carreras()
-mostrar_areas()
-
-grado = int(input('Escribe el grado (0,1,2,etc): '))
-
-obtener_materias(grado, 0, 0)
-mostrar_materias()
-
-if MATERIAS:
-    indice_materia = int(input('Escribe el índice de la materia para ver sus docentes: '))
-    if 0 <= indice_materia < len(MATERIAS):
-        materia_seleccionada = MATERIAS[indice_materia]
-        materia_id = materia_seleccionada['id']
-       
-        obtener_docentes_por_materia(materia_id)
+    # 2. Construir la lista de clases interactivamente
+    clases_para_grupo = []
+    while True:
+        print("\n--- Añadir una nueva clase al grupo ---")
+        
+        # Obtener y mostrar materias para el semestre seleccionado
+        obtener_materias(grado_idx, carrera_id, area_id)
+        mostrar_materias()
+        if not MATERIAS:
+            print("No hay materias para este grado/carrera. No se pueden añadir más clases.")
+            break
+        
+        materia_idx = int(input("Selecciona el índice de la materia: "))
+        materia_seleccionada = MATERIAS[materia_idx]
+        
+        # Obtener y mostrar docentes para esa materia
+        obtener_datos(f"{DOCENTES_URL}/materia/{materia_seleccionada['id']}", DOCENTES, "DOCENTES")
         mostrar_docentes()
-    else:
-        print("[=!=] Índice de materia no válido.")
+        docente_idx = int(input("Selecciona el índice del docente: "))
+        docente_seleccionado = DOCENTES[docente_idx]
+        
+        # Mostrar aulas (asumimos que todas están disponibles por simplicidad)
+        mostrar_aulas()
+        aula_idx = int(input("Selecciona el índice del aula: "))
+        aula_seleccionada = AULAS[aula_idx]
 
+        # Crear horario (ejemplo simple)
+        dia = input("Día de la semana (LUNES, MARTES...): ").upper()
+        hora_inicio = input("Hora de inicio (HH:MM:SS): ")
+        hora_fin = input("Hora de fin (HH:MM:SS): ")
+        
+        # Construir el objeto Clase
+        nueva_clase = {
+            "materiaId": materia_seleccionada['id'],
+            "docenteId": docente_seleccionado['id'],
+            "aulaId": aula_seleccionada['id'],
+            "horarios": [{
+                "dia": dia,
+                "horaInicio": hora_inicio,
+                "horaFin": hora_fin
+            }]
+        }
+        clases_para_grupo.append(nueva_clase)
+        
+        if input("¿Añadir otra clase? (s/n): ").lower() != 's':
+            break
+
+    # 3. Construir el payload final del Grupo
+    grupo_payload = {
+        "nota": nota,
+        "letra": letra,
+        "activo": True,
+        "semestre": SEMESTRES[grado_idx],
+        "turno": turno,
+        "cicloEscolarId": CICLO_ESCOLAR_ACTIVO_ID,
+        "carreraTecnicaId": carrera_id,
+        "areaPropedeuticaId": area_id,
+        "clases": clases_para_grupo
+    }
+
+    # 4. Enviar la petición POST
+    print("\nEnviando datos del grupo al servidor...")
+    print(json.dumps(grupo_payload, indent=2)) # Muestra el JSON que se va a enviar
+    
+    try:
+        response = requests.post(GRUPOS_URL, json=grupo_payload)
+        response.raise_for_status() # Lanza excepción para errores 4xx/5xx
+        
+        print("\n¡ÉXITO! Grupo creado correctamente.")
+        print("Respuesta del servidor:")
+        print(response.json())
+        
+    except requests.exceptions.RequestException as e:
+        print(f"\n[=!=] ERROR al crear el grupo: {e}")
+        if e.response:
+            print(f"Detalles del error: {e.response.text}")
+
+
+# TODO: se debe de agregar la validacion de si se puede crear la clase.
+
+# --- Flujo Principal ---
+print("Cargando datos iniciales...")
+obtener_ciclo_escolar_activo()
+obtener_datos(AREAS_PROPEDEUTICAS_URL, AREAS_PROPEDEUTICAS, "AREAS_PROPEDEUTICAS")
+obtener_datos(CARRERAS_URL, CARRERAS_TECNICAS, "CARRERAS_TECNICAS")
+obtener_datos(AULAS_URL, AULAS, "AULAS")
+print("¡Datos cargados!")
+
+# Iniciar el proceso de creación de grupo
+crear_y_enviar_grupo()
