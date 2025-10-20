@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Service
 public class CicloEscolarServiceImpl implements CicloEscolarService {
-    private CicloEscolarRepository cicloEscolarRepository;
+    private final CicloEscolarRepository cicloEscolarRepository;
 
     public CicloEscolarServiceImpl(CicloEscolarRepository cicloEscolarRepository) {
         this.cicloEscolarRepository = cicloEscolarRepository;

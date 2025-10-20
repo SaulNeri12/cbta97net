@@ -1,0 +1,58 @@
+{
+  "nota": "Grupo de primer semestre turno matutino",
+  "letra": "A",
+  "activo": true,
+  "semestre": "Primer_Semestre",
+  "turno": "MATUTINO",
+  "cicloEscolarId": 1,
+  "carreraTecnicaId": 1,
+  "areaPropedeuticaId": null,
+  "clases": [
+    {
+      "materiaId": 1,
+      "docenteId": 1,
+      "aulaId": 1,
+      "horarios": [
+        {
+          "dia": "LUNES",
+          "horaInicio": "08:00:00",
+          "horaFin": "10:00:00"
+        },
+        {
+          "dia": "MIERCOLES",
+          "horaInicio": "08:00:00",
+          "horaFin": "10:00:00"
+        }
+      ]
+    },
+    {
+      "materiaId": 2,
+      "docenteId": 2,
+      "aulaId": 2,
+      "horarios": [
+        {
+          "dia": "MARTES",
+          "horaInicio": "10:00:00",
+          "horaFin": "12:00:00"
+        },
+        {
+          "dia": "JUEVES",
+          "horaInicio": "10:00:00",
+          "horaFin": "12:00:00"
+        }
+      ]
+    },
+    {
+      "materiaId": 3,
+      "docenteId": 3,
+      "aulaId": 1,
+      "horarios": [
+        {
+          "dia": "VIERNES",
+          "horaInicio": "08:00:00",
+          "horaFin": "11:00:00"
+        }
+      ]
+    }
+  ]
+}
