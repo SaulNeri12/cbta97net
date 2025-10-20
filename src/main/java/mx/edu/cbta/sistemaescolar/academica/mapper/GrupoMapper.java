@@ -49,7 +49,7 @@ public abstract class GrupoMapper {
         try {
             return cicloEscolarService.obtenerCicloEscolarPorId(id);
         } catch (CicloEscolarNoEncontradoException e) {
-            return null;
+            throw new RuntimeException("No se encontró el ciclo escolar con ID", e);
         }
     }
 

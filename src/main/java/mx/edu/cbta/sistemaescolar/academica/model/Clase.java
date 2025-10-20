@@ -7,7 +7,11 @@ import mx.edu.cbta.sistemaescolar.personal.model.Docente;
 
 import java.util.Set;
 
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 @Table(name = "clases")
 public class Clase {

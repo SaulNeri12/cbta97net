@@ -58,6 +58,15 @@ public class MateriaController {
         return ResponseEntity.ok(materiasDTO);
     }
 
+    @GetMapping("/area/{id}")
+    public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorAreaPropedeutica(@PathVariable Long id) throws MateriaNoEncontradaException    {
+        List<Materia> materias = materiaService.obtenerTodasPorAreaPropedeutica(id);
+        List<MateriaDTO> materiasDTO = materias.stream()
+                .map(materiaMapper::toDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(materiasDTO);
+    }
+
     @GetMapping("/grado/{grado}")
     public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorGrado(@PathVariable Grado grado) {
         List<Materia> materias = materiaService.obtenerMateriasPorGrado(grado);

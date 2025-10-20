@@ -460,17 +460,3 @@ VALUES
 (7, 1),  -- Álgebra (Puede cubrir)
 (7, 18); -- Mantenimiento de Hardware (Puede cubrir)
 
-"""
-select * from materias where id = 1;
-
-SELECT 
-    d.usuario_id AS docente_id,
-    CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno) AS docente_nombre,
-    d.cedula_profesional,
-    u.email,
-    u.telefono
-FROM docentes d
-JOIN usuarios u ON u.id = d.usuario_id
-JOIN docentes_materias dm ON dm.docente_id = d.usuario_id
-WHERE dm.materia_id = 1;
-"""

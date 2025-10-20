@@ -13,6 +13,8 @@ public interface MateriaService {
     Materia registrarMateria(Materia materia);
     
     List<Materia> obtenerTodasLasMaterias();
+
+    List<Materia> obtenerTodasPorAreaPropedeutica(Long areaPropedeuticaId);
     
     List<Materia> obtenerMateriasPorCarrera(Long carreraTecnicaId);
     

@@ -58,6 +58,13 @@ public class GrupoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(grupoDTO);
     }
 
+    @GetMapping
+    public ResponseEntity<List<GrupoDTO>> listarGrupos() {
+        List<Grupo> grupos = grupoService.obtenerGrupos();
+        List<GrupoDTO> gruposDTOs = grupos.stream().map(grupoMapper::toDTO).collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(gruposDTOs);
+    }
+
     @PostMapping("/validar-clase")
     public ResponseEntity<?> validarClase(@Valid @RequestBody ClaseDTO claseDTO, BindingResult bindingResult) throws GrupoException {
         Map<String, String> response = new HashMap<>();
@@ -72,7 +79,6 @@ public class GrupoController {
         }
 
         try {
-
             validarClase(claseDTO);
 
             response.put("message", "La clase se ha validado con éxito");

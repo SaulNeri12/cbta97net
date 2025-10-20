@@ -36,6 +36,11 @@ public class MateriaServiceImpl implements MateriaService {
     }
 
     @Override
+    public List<Materia> obtenerTodasPorAreaPropedeutica(Long areaPropedeuticaId) {
+        return this.materiaRepository.findByAreaPropedeuticaId(areaPropedeuticaId);
+    }
+
+    @Override
     public List<Materia> obtenerMateriasPorCarrera(Long carreraTecnicaId) {
         return materiaRepository.findByCarreraTecnicaId(carreraTecnicaId);
     }

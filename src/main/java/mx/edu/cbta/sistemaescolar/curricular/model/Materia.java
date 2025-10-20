@@ -8,8 +8,11 @@ import lombok.Data;
 import mx.edu.cbta.sistemaescolar.personal.model.Docente;
 
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "materias")
 public class Materia {

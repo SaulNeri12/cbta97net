@@ -2,8 +2,11 @@ package mx.edu.cbta.sistemaescolar.academica.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "aulas")
 public class Aula {

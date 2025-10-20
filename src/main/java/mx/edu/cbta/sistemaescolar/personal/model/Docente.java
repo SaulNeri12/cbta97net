@@ -7,10 +7,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import mx.edu.cbta.sistemaescolar.academica.model.Clase;
 import mx.edu.cbta.sistemaescolar.curricular.model.Materia;
 
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "docentes")
