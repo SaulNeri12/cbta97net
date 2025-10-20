@@ -223,10 +223,19 @@ def crear_y_enviar_grupo():
         print(response.json())
         
     except requests.exceptions.RequestException as e:
-        print(f"\n[=!=] ERROR al crear el grupo: {e}")
-        if e.response:
-            print(f"Detalles del error: {e.response.text}")
-
+        print("\n[=!=] ❌ ERROR al crear el grupo:")
+        # Si hay respuesta del servidor (por ejemplo, un 400 o 500)
+        if hasattr(e, "response") and e.response is not None:
+            print(f"→ Código HTTP: {e.response.status_code}")
+            try:
+                error_json = e.response.json()
+                print("→ Detalles del error (JSON):", json.dumps(error_json, indent=4, ensure_ascii=False))
+            except ValueError:
+                print("→ Detalles del error (texto):", e.response.text)
+        else:
+            # Si fue un error de conexión o timeout
+            print("→ No se recibió respuesta del servidor.")
+            print(f"→ Detalles: {e}")
 
 # TODO: se debe de agregar la validacion de si se puede crear la clase.
 

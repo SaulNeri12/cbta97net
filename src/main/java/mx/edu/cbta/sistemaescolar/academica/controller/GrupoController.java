@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import mx.edu.cbta.sistemaescolar.academica.dto.ClaseDTO;
 import mx.edu.cbta.sistemaescolar.academica.dto.GrupoDTO;
 import mx.edu.cbta.sistemaescolar.academica.mapper.GrupoMapper;
+import mx.edu.cbta.sistemaescolar.academica.model.Clase;
 import mx.edu.cbta.sistemaescolar.academica.model.Grupo;
 import mx.edu.cbta.sistemaescolar.academica.model.Horario;
 import mx.edu.cbta.sistemaescolar.academica.service.AulaService;
@@ -51,10 +52,27 @@ public class GrupoController {
     private MateriaService materiaService;
 
     @PostMapping
-    public ResponseEntity<GrupoDTO> crearGrupoConClases(@Valid @RequestBody GrupoDTO dto)
+    public ResponseEntity<?> crearGrupoConClases(@Valid @RequestBody GrupoDTO grupoNuevoDTO)
             throws GrupoException {
-        Grupo grupoCreado = grupoService.crearGrupoConClases(dto);
+
+        Map<String, String> response = new HashMap<>();
+
+        try {
+            for (ClaseDTO clase : grupoNuevoDTO.getClases()) {
+                validarClase(clase);
+            }
+        } catch (DocenteException | AulaNoDisponibleException | GrupoException e) {
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            response.put("error", "Ocurrió un error inesperado");
+            System.out.println(e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+
+        Grupo grupoCreado = grupoService.crearGrupoConClases(grupoNuevoDTO);
         GrupoDTO grupoDTO = grupoMapper.toDTO(grupoCreado);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(grupoDTO);
     }
 

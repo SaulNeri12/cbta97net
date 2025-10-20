@@ -40,30 +40,39 @@ public class DocenteServiceImpl implements DocenteService {
 
     @Override
     public Docente obtenerDocentePorId(Long id) throws DocenteException {
-        return docenteRepository.findById(id)
+        Docente docente = docenteRepository.findById(id)
                 .orElseThrow(() -> new DocenteException("No se encontró el docente con el ID: " + id));
+        docente.getClases().size();
+        return docente;
     }
 
     @Override
     public boolean docenteDisponibleEnHorario(Long idDocente, Horario nuevoHorario) throws DocenteException {
         Docente docente = obtenerDocentePorId(idDocente);
 
+        // Obtener ciclo escolar activo
+        CicloEscolar cicloVigente;
         try {
-            cicloEscolarService.obtenerCicloEscolarActivo();
+            cicloVigente = cicloEscolarService.obtenerCicloEscolarActivo();
         } catch (CicloEscolarNoEncontradoException e) {
             throw new DocenteException("No se pudo verificar la disponibilidad del docente debido a que no hay un ciclo escolar vigente.");
         }
 
         Set<Clase> clasesDocente = docente.getClases();
 
-        if (clasesDocente.isEmpty()) {
+        // Si el docente no tiene clases, está disponible
+        if (clasesDocente == null || clasesDocente.isEmpty()) {
             return true;
         }
 
-        // verifica si los horarios de las clases de los docentes no se empalman con el nuevo horario...
-        return docente.getClases().stream()
+        // Solo considerar clases del ciclo vigente
+        boolean ocupado = clasesDocente.stream()
+                .filter(clase -> cicloVigente.equals(clase.getGrupo().getCicloEscolar()))
                 .flatMap(clase -> clase.getHorarios().stream())
-                .noneMatch(horario -> horario.seEmpalmaCon(nuevoHorario));
+                .anyMatch(horario -> horario.seEmpalmaCon(nuevoHorario));
+
+        // Si no hay empalmes → disponible
+        return !ocupado;
     }
 
 
