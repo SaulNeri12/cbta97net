@@ -8,7 +8,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
+import org.hibernate.Hibernate;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,13 +29,21 @@ public interface DocenteMapper {
 
     @Named("clasesToIds")
     default Set<Long> clasesToIds(Set<Clase> clases) {
-        if (clases == null) return null;
-        return clases.stream().map(Clase::getId).collect(Collectors.toSet());
+        if (clases == null || !Hibernate.isInitialized(clases)) {
+            return Collections.emptySet();
+        }
+        return clases.stream()
+                .map(Clase::getId)
+                .collect(Collectors.toSet());
     }
 
     @Named("materiasToNombres")
     default Set<String> materiasToNombres(Set<Materia> materias) {
-        if (materias == null) return null;
-        return materias.stream().map(Materia::getNombre).collect(Collectors.toSet());
+        if (materias == null || !Hibernate.isInitialized(materias)) {
+            return Collections.emptySet();
+        }
+        return materias.stream()
+                .map(Materia::getNombre)
+                .collect(Collectors.toSet());
     }
 }

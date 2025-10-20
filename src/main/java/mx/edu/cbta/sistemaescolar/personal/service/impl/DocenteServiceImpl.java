@@ -1,5 +1,10 @@
 package mx.edu.cbta.sistemaescolar.personal.service.impl;
 
+import mx.edu.cbta.sistemaescolar.academica.model.Clase;
+import mx.edu.cbta.sistemaescolar.academica.model.Horario;
+import mx.edu.cbta.sistemaescolar.curricular.model.CicloEscolar;
+import mx.edu.cbta.sistemaescolar.curricular.service.CicloEscolarService;
+import mx.edu.cbta.sistemaescolar.curricular.service.exception.CicloEscolarNoEncontradoException;
 import mx.edu.cbta.sistemaescolar.personal.model.Docente;
 import mx.edu.cbta.sistemaescolar.personal.repository.DocenteRepository;
 import mx.edu.cbta.sistemaescolar.personal.service.DocenteService;
@@ -7,16 +12,21 @@ import mx.edu.cbta.sistemaescolar.personal.service.exception.DocenteException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class DocenteServiceImpl implements DocenteService {
 
-    private final DocenteRepository docenteRepository;
 
-    @Autowired
-    public DocenteServiceImpl(DocenteRepository docenteRepository) {
+    private DocenteRepository docenteRepository;
+    private CicloEscolarService cicloEscolarService;
+
+    public DocenteServiceImpl(DocenteRepository docenteRepository, CicloEscolarService cicloEscolarService) {
         this.docenteRepository = docenteRepository;
+        this.cicloEscolarService = cicloEscolarService;
     }
 
     @Override
@@ -30,63 +40,51 @@ public class DocenteServiceImpl implements DocenteService {
 
     @Override
     public Docente obtenerDocentePorId(Long id) throws DocenteException {
-        return docenteRepository.findById(id)
+        Docente docente = docenteRepository.findById(id)
                 .orElseThrow(() -> new DocenteException("No se encontró el docente con el ID: " + id));
+        docente.getClases().size();
+        return docente;
     }
 
     @Override
-    public Docente registrar(Docente docente) throws DocenteException {
+    public boolean docenteDisponibleEnHorario(Long idDocente, Horario nuevoHorario) throws DocenteException {
+        Docente docente = obtenerDocentePorId(idDocente);
+
+        // Obtener ciclo escolar activo
+        CicloEscolar cicloVigente;
         try {
-            return docenteRepository.save(docente);
-        } catch (DataIntegrityViolationException e) {
-            throw new DocenteException("Error de integridad de datos al guardar el docente. " +
-                    "Es posible que el CURP, email o cédula profesional ya existan.");
-        } catch (Exception e) {
-            throw new DocenteException("Error al registrar al docente.");
+            cicloVigente = cicloEscolarService.obtenerCicloEscolarActivo();
+        } catch (CicloEscolarNoEncontradoException e) {
+            throw new DocenteException("No se pudo verificar la disponibilidad del docente debido a que no hay un ciclo escolar vigente.");
         }
+
+        Set<Clase> clasesDocente = docente.getClases();
+
+        // Si el docente no tiene clases, está disponible
+        if (clasesDocente == null || clasesDocente.isEmpty()) {
+            return true;
+        }
+
+        // Solo considerar clases del ciclo vigente
+        boolean ocupado = clasesDocente.stream()
+                .filter(clase -> cicloVigente.equals(clase.getGrupo().getCicloEscolar()))
+                .flatMap(clase -> clase.getHorarios().stream())
+                .anyMatch(horario -> horario.seEmpalmaCon(nuevoHorario));
+
+        // Si no hay empalmes → disponible
+        return !ocupado;
     }
 
-    @Override
-    public Docente actualizar(Long id, Docente docenteDetails) throws DocenteException {
-        // Primero, usamos el método de obtener por ID para asegurarnos de que el docente exista.
-        Docente docenteExistente = obtenerDocentePorId(id);
-
-        // Actualizamos los campos del objeto existente con la nueva información.
-        docenteExistente.setNombre(docenteDetails.getNombre());
-        docenteExistente.setApellidoPaterno(docenteDetails.getApellidoPaterno());
-        docenteExistente.setApellidoMaterno(docenteDetails.getApellidoMaterno());
-        docenteExistente.setCurp(docenteDetails.getCurp());
-        docenteExistente.setEmail(docenteDetails.getEmail());
-        docenteExistente.setTelefono(docenteDetails.getTelefono());
-        docenteExistente.setCedulaProfesional(docenteDetails.getCedulaProfesional());
-        docenteExistente.setActivo(docenteDetails.isActivo());
-        // Se podrían actualizar también las relaciones (roles, materias) si la lógica de negocio lo requiere.
-
-        try {
-            return docenteRepository.save(docenteExistente);
-        } catch (Exception e) {
-            throw new DocenteException("Error al actualizar el docente con ID: " + id);
-        }
-    }
-
-    @Override
-    public void eliminar(Long id) throws DocenteException {
-        if (!docenteRepository.existsById(id)) {
-            throw new DocenteException("No se encontró el docente con el ID: " + id + " para eliminar.");
-        }
-        try {
-            docenteRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new DocenteException("Error al eliminar el docente con ID: " + id);
-        }
-    }
 
     @Override
     public List<Docente> obtenerDocentePorMateria(Long materiaId) throws DocenteException {
         try {
-            return docenteRepository.findByMaterias_Id(materiaId);
+            List<Docente> docentes = docenteRepository.findByMateriasId(materiaId);
+            System.out.println("Total docentes encontrados: " + docentes.size());
+            return docentes;
         } catch (Exception e) {
-            throw new DocenteException("Error al buscar docentes para la materia con ID: " + materiaId);
+            e.printStackTrace();
+            throw new DocenteException("Error al buscar docentes para la materia con ID: " + materiaId + " - " + e.getMessage());
         }
     }
 }

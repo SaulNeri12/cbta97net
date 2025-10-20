@@ -10,7 +10,11 @@ import mx.edu.cbta.sistemaescolar.curricular.model.Grado;
 
 import java.util.Set;
 
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 @Table(name = "grupos")
 public class Grupo {

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Service
 public class CicloEscolarServiceImpl implements CicloEscolarService {
-    private CicloEscolarRepository cicloEscolarRepository;
+    private final CicloEscolarRepository cicloEscolarRepository;
 
     public CicloEscolarServiceImpl(CicloEscolarRepository cicloEscolarRepository) {
         this.cicloEscolarRepository = cicloEscolarRepository;
@@ -21,5 +21,10 @@ public class CicloEscolarServiceImpl implements CicloEscolarService {
         LocalDate hoy = LocalDate.now();
         return Optional.ofNullable(cicloEscolarRepository.obtenerCicloEscolarActivo(hoy))
                 .orElseThrow(() -> new CicloEscolarNoEncontradoException("No hay ciclo escolar vigente"));
+    }
+
+    @Override
+    public CicloEscolar obtenerCicloEscolarPorId(Long id) throws CicloEscolarNoEncontradoException {
+        return this.cicloEscolarRepository.findById(id).orElseThrow(() -> new CicloEscolarNoEncontradoException("No se encontro el ciclo escolar."));
     }
 }
