@@ -1,14 +1,22 @@
 package mx.edu.cbta.sistemaescolar.academica.controller;
 
+import jakarta.validation.Valid;
 import mx.edu.cbta.sistemaescolar.academica.dto.AulaDTO;
+import mx.edu.cbta.sistemaescolar.academica.dto.AulaDisponibleDTO;
 import mx.edu.cbta.sistemaescolar.academica.mapper.AulaMapper;
 import mx.edu.cbta.sistemaescolar.academica.model.Aula;
+import mx.edu.cbta.sistemaescolar.academica.model.Horario;
 import mx.edu.cbta.sistemaescolar.academica.service.AulaService;
+import mx.edu.cbta.sistemaescolar.academica.service.exceptions.AulaNoDisponibleException;
+import mx.edu.cbta.sistemaescolar.personal.dto.DocenteDisponibleDTO;
+import mx.edu.cbta.sistemaescolar.personal.service.exception.DocenteException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -40,5 +48,19 @@ public class AulaController {
                 .map(aulaMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(aulasDTO);
+    }
+
+    @PostMapping("/disponible")
+    public ResponseEntity<?> aulaDisponibleEnHorario(@Valid @RequestBody AulaDisponibleDTO infoAula, BindingResult bindingResult) throws AulaNoDisponibleException {
+        for (Horario horario : infoAula.getHorarios()) {
+            boolean aulaDisponible = this.aulaService.aulaDisponibleEnHorario(infoAula.getIdAula(), horario);
+            if (!aulaDisponible) {
+                Map<String, String> error = Map.of("error", "El aula no está disponible.");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+            }
+        }
+
+        Map<String, String> ok = Map.of("message", "El aula está disponible.");
+        return ResponseEntity.ok(ok);
     }
 }
