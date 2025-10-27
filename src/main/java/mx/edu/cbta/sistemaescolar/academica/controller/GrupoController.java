@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 @RestController
 @RequestMapping("/grupos")
 public class GrupoController {
@@ -55,6 +56,25 @@ public class GrupoController {
     @PostMapping
     public ResponseEntity<?> crearGrupoConClases(@Valid @RequestBody GrupoDTO grupoNuevoDTO)
             throws GrupoException {
+
+        System.out.println("=== DEBUG BACKEND - JSON RECIBIDO ===");
+        System.out.println("GrupoDTO completo: " + grupoNuevoDTO);
+
+
+        if (grupoNuevoDTO.getClases() != null) {
+            System.out.println("Número de clases: " + grupoNuevoDTO.getClases().size());
+            for (int i = 0; i < grupoNuevoDTO.getClases().size(); i++) {
+                ClaseDTO clase = grupoNuevoDTO.getClases().get(i);
+                System.out.println("Clase " + i + " - materiaId: " + clase.getMateriaId());
+                System.out.println("Clase " + i + " - docenteId: " + clase.getDocenteId());
+                System.out.println("Clase " + i + " - aulaId: " + clase.getAulaId());
+            }
+        } else {
+            System.out.println("CLASES ES NULL!");
+        }
+        System.out.println("=== FIN DEBUG ===");
+
+
 
         Map<String, String> response = new HashMap<>();
 

@@ -409,53 +409,237 @@ VALUES
 (9, 'CED1234569'),
 (10, 'CED1234570');
 
-INSERT INTO docentes_materias (docente_id, materia_id)
-VALUES
--- Docente 1 (Juan Pérez) - Especialista en Matemáticas y Física
-(1, 1),  -- Álgebra
-(1, 2),  -- Geometría y Trigonometría
-(1, 3),  -- Cálculo Diferencial
-(1, 4),  -- Cálculo Integral
-(1, 5),  -- Probabilidad y Estadística
-(1, 14), -- Física I
-(1, 19), -- Física II
+-- Docente 1 (Carlos Gomez) - Todas las Matemáticas
+INSERT INTO docentes_materias (docente_id, materia_id) VALUES
+(1, 1),   -- Matemáticas I
+(1, 9),   -- Matemáticas II (Soporte)
+(1, 17),  -- Matemáticas II (Agrícola)
+(1, 25),  -- Matemáticas II (Pecuaria)
+(1, 33),  -- Matemáticas II (Agropecuario)
+(1, 41),  -- Matemáticas II (Desarrollo)
+(1, 49),  -- Matemáticas III (Soporte)
+(1, 57),  -- Matemáticas III (Agrícola)
+(1, 65),  -- Matemáticas III (Pecuaria)
+(1, 73),  -- Matemáticas III (Agropecuario)
+(1, 81),  -- Matemáticas III (Desarrollo)
+(1, 89),  -- Matemáticas IV (Soporte)
+(1, 97),  -- Matemáticas IV (Agrícola)
+(1, 105), -- Matemáticas IV (Pecuaria)
+(1, 113), -- Matemáticas IV (Agropecuario)
+(1, 121), -- Matemáticas IV (Desarrollo)
+(1, 129), -- Matemáticas V (Soporte)
+(1, 137), -- Matemáticas V (Agrícola)
+(1, 145), -- Matemáticas V (Pecuaria)
+(1, 153), -- Matemáticas V (Agropecuario)
+(1, 161), -- Matemáticas V (Desarrollo)
+(1, 169), -- Matemáticas VI (Soporte)
+(1, 177), -- Matemáticas VI (Agrícola)
+(1, 185), -- Matemáticas VI (Pecuaria)
+(1, 193), -- Matemáticas VI (Agropecuario)
+(1, 201); -- Matemáticas VI (Desarrollo)
 
--- Docente 2 (Ana Gómez) - Especialista en Comunicación y Lenguas
-(2, 6),  -- Inglés I
-(2, 7),  -- LEOyE I
-(2, 11), -- Inglés II
-(2, 12), -- LEOyE II
-(2, 16), -- Inglés III
-(2, 21), -- Inglés IV
-(2, 25), -- Inglés V
+-- Docente 2 (Ana Martinez) - Inglés y Comunicación
+INSERT INTO docentes_materias (docente_id, materia_id) VALUES
+(2, 4),   -- Comunicación Oral y Escrita
+(2, 6),   -- Inglés I
+(2, 10),  -- Inglés II (Soporte)
+(2, 44),  -- Comunicación para el Desarrollo
+(2, 50),  -- Inglés III (Soporte)
+(2, 90),  -- Inglés IV (Soporte)
+(2, 130), -- Inglés V (Soporte)
+(2, 167), -- Comunicación Estratégica para el Desarrollo
+(2, 170); -- Inglés VI (Soporte)
 
--- Docente 3 (Carlos Sánchez) - Especialista en Soporte y Mantenimiento / Ofimática
-(3, 18), -- Mantenimiento de Hardware
-(3, 23), -- Redes de Computadoras
-(3, 27), -- Software de Aplicación
-(3, 30), -- Sistemas Operativos
-(3, 31), -- Hojas de Cálculo Avanzadas
-(3, 32), -- Presentaciones Gráficas
+-- Docente 3 (Luis Ramirez) - Soporte (Hardware/Mantenimiento)
+INSERT INTO docentes_materias (docente_id, materia_id) VALUES
+(3, 5),   -- Tecnologías de la Información y la Comunicación
+(3, 12),  -- Electricidad y Electrónica Básica
+(3, 13),  -- Mantenimiento Preventivo de Equipos de Cómputo
+(3, 15),  -- Ensambles y Desensambles de PC
+(3, 53),  -- Mantenimiento Correctivo de Equipos de Cómputo
+(3, 92),  -- Diagnóstico y Reparación de Fallas en Hardware
+(3, 94),  -- Soporte Técnico a Usuarios
+(3, 132), -- Mantenimiento de Equipos Portátiles y Dispositivos Móviles
+(3, 174); -- Diagnóstico y Solución de Fallas Avanzadas
 
--- Docente 4 (María Rodríguez) - Especialista en Ciencias Químico-Biológicas
-(4, 8),  -- Química I
-(4, 13), -- Química II
-(4, 17), -- Ecología
-(4, 22), -- Biología
+-- Docente 4 (Marta Hernandez) - Química y Biología
+INSERT INTO docentes_materias (docente_id, materia_id) VALUES
+(4, 2),   -- Química I
+(4, 3),   -- Biología General
+(4, 18),  -- Química Agrícola
+(4, 19),  -- Biología Vegetal
+(4, 21),  -- Fisiología Vegetal
+(4, 26),  -- Anatomía y Fisiología Animal
+(4, 34),  -- Química del Suelo
+(4, 59),  -- Fitotecnia
+(4, 66),  -- Fisiología de la Reproducción Animal
+(4, 74),  -- Biotecnología Agropecuaria
+(4, 156); -- Biotecnología Aplicada al Campo
 
--- Docente 5 (Luis Martínez) - Especialista en Programación y Bases de Datos
-(5, 10), -- Algoritmos
-(5, 15), -- Programación
-(5, 20), -- Bases de Datos
-(5, 24), -- Desarrollo de Aplicaciones Web
-(5, 28), -- Programación Orientada a Objetos
+-- Docente 5 (Jose Lopez) - Soporte (Software/Redes)
+INSERT INTO docentes_materias (docente_id, materia_id) VALUES
+(5, 14),  -- Sistemas Operativos
+(5, 16),  -- Redes de Computadoras I
+(5, 52),  -- Electrónica Digital
+(5, 54),  -- Redes de Computadoras II
+(5, 55),  -- Arquitectura de Computadoras
+(5, 56),  -- Seguridad y Respaldo de Información
+(5, 93),  -- Administración de Redes de Computadoras
+(5, 95),  -- Instalación y Configuración de Software Especializado
+(5, 96),  -- Proyecto Integrador de Mantenimiento de Cómputo
+(5, 133), -- Administración de Servidores
+(5, 134), -- Redes Inalámbricas y Conectividad Avanzada
+(5, 135), -- Automatización y Control con Microcontroladores
+(5, 136), -- Proyecto Integrador de Redes y Soporte
+(5, 172), -- Virtualización y Computación en la Nube
+(5, 173), -- Administración de Seguridad Informática
+(5, 175), -- Soporte Técnico Empresarial
+(5, 176); -- Proyecto Integrador de Mantenimiento y Redes
 
--- Docente 6 (Laura Pérez) - Especialista en Humanidades y Ciencias Sociales
-(6, 9),  -- Ética
-(6, 26), -- Ciencias Sociales
-(6, 29), -- Temas de Filosofía
+-- Docente 6 (Laura Perez) - Formación Sociocultural y Carrera 5 (Desarrollo Comunitario)
+INSERT INTO docentes_materias (docente_id, materia_id) VALUES
+(6, 7),   -- Formación Sociocultural I
+(6, 11),  -- Formación Sociocultural II
+(6, 42),  -- Sociología Rural y Urbana
+(6, 43),  -- Desarrollo Sustentable
+(6, 45),  -- Diseño y Gestión de Proyectos Comunitarios
+(6, 46),  -- Educación Ambiental
+(6, 47),  -- Economía Social y Solidaria
+(6, 48),  -- Práctica Comunitaria I
+(6, 51),  -- Formación Sociocultural III
+(6, 82),  -- Psicología Comunitaria
+(6, 83),  -- Planeación del Desarrollo Local
+(6, 84),  -- Gestión Social y Participación Ciudadana
+(6, 85),  -- Educación para la Salud Comunitaria
+(6, 86),  -- Evaluación de Proyectos Comunitarios
+(6, 87),  -- Economía del Desarrollo
+(6, 88),  -- Práctica Comunitaria II
+(6, 91),  -- Formación Sociocultural IV
+(6, 122), -- Intervención Comunitaria
+(6, 123), -- Diseño de Estrategias de Desarrollo
+(6, 124), -- Gestión de Recursos y Financiamiento Social
+(6, 125), -- Cultura y Diversidad Comunitaria
+(6, 126), -- Liderazgo y Trabajo en Equipo
+(6, 127), -- Evaluación del Impacto Social de Proyectos
+(6, 128), -- Práctica Comunitaria III
+(6, 131), -- Formación Sociocultural V
+(6, 162), -- Desarrollo Económico Local
+(6, 163), -- Administración de Proyectos Sociales
+(6, 164), -- Educación y Capacitación Comunitaria
+(6, 165), -- Gestión Cultural y Patrimonio Comunitario
+(6, 166), -- Diseño y Evaluación de Políticas Públicas
+(6, 168), -- Práctica Comunitaria IV
+(6, 171), -- Formación Sociocultural VI
+(6, 202), -- Gestión de Políticas Públicas Locales
+(6, 203), -- Evaluación de Programas Comunitarios
+(6, 204), -- Mediación y Resolución de Conflictos Sociales
+(6, 205), -- Educación para la Transformación Social
+(6, 206), -- Sustentabilidad y Responsabilidad Social
+(6, 207), -- Proyectos de Innovación Comunitaria
+(6, 208); -- Prácticas Profesionales Comunitarias
 
--- Docente 7 (Miguel Vázquez) - Docente de Apoyo en Informática y Matemáticas
-(7, 1),  -- Álgebra (Puede cubrir)
-(7, 18); -- Mantenimiento de Hardware (Puede cubrir)
+-- Docente 8 (Sofia Santos) - Carrera 2 (Producción Agrícola)
+INSERT INTO docentes_materias (docente_id, materia_id) VALUES
+(8, 20),  -- Edafología (Ciencia del Suelo)
+(8, 22),  -- Maquinaria y Herramientas Agrícolas
+(8, 23),  -- Propagación de Plantas
+(8, 24),  -- Riego y Drenaje Agrícola
+(8, 58),  -- Fertilidad de Suelos
+(8, 60),  -- Control de Plagas y Enfermedades Vegetales
+(8, 61),  -- Topografía y Cartografía Agrícola
+(8, 62),  -- Manejo de Invernaderos
+(8, 63),  -- Horticultura
+(8, 64),  -- Prácticas de Campo Agrícola I
+(8, 98),  -- Agrometeorología
+(8, 99),  -- Cultivos Básicos y Estratégicos
+(8, 100), -- Manejo Integrado de Plagas y Enfermedades
+(8, 101), -- Producción en Ambientes Controlados
+(8, 102), -- Postcosecha y Comercialización de Productos Agrícolas
+(8, 103), -- Agroindustria de Transformación
+(8, 104), -- Prácticas de Campo Agrícola II
+(8, 138), -- Cultivos de Exportación
+(8, 139), -- Producción Orgánica y Sustentable
+(8, 140), -- Administración de Empresas Agropecuarias
+(8, 141), -- Gestión de la Calidad e Inocuidad Agroalimentaria
+(8, 142), -- Agroindustria y Valor Agregado
+(8, 143), -- Comercialización y Mercadotecnia Agrícola
+(8, 144), -- Prácticas de Campo Agrícola III
+(8, 178), -- Producción de Semillas Certificadas
+(8, 179), -- Sistemas Agroforestales
+(8, 180), -- Manejo Postcosecha y Control de Calidad
+(8, 181), -- Gestión Ambiental en la Producción Agrícola
+(8, 182), -- Planeación de Proyectos Productivos Agrícolas
+(8, 183), -- Innovación y Tecnología Agrícola
+(8, 184); -- Prácticas Profesionales Agrícolas
 
+-- Docente 9 (Diego Morales) - Carrera 3 (Producción Pecuaria)
+INSERT INTO docentes_materias (docente_id, materia_id) VALUES
+(9, 27),  -- Nutrición Animal
+(9, 28),  -- Manejo y Reproducción de Especies Pecuarias
+(9, 29),  -- Sanidad Animal
+(9, 30),  -- Producción de Alimentos para el Ganado
+(9, 31),  -- Prácticas de Campo Pecuario
+(9, 32),  -- Economía Pecuaria
+(9, 67),  -- Manejo de Pastos y Forrajes
+(9, 68),  -- Producción Bovina
+(9, 69),  -- Sanidad y Bioseguridad Pecuaria
+(9, 70),  -- Producción Porcina
+(9, 71),  -- Economía y Administración Pecuaria
+(9, 72),  -- Prácticas de Campo Pecuario II
+(9, 106), -- Producción Avícola
+(9, 107), -- Producción Caprina y Ovina
+(9, 108), -- Procesamiento de Productos Pecuarios
+(9, 109), -- Administración de Unidades de Producción Pecuaria
+(9, 110), -- Mejoramiento Genético Animal
+(9, 111), -- Sanidad y Bienestar Animal
+(9, 112), -- Prácticas de Campo Pecuario III
+(9, 146), -- Producción Apícola
+(9, 147), -- Producción Cunícola y de Especies Menores
+(9, 148), -- Procesamiento de Carne y Lácteos
+(9, 149), -- Gestión de la Producción Pecuaria
+(9, 150), -- Sistemas de Información para la Producción Pecuaria
+(9, 151), -- Normatividad y Bienestar Animal
+(9, 152), -- Prácticas de Campo Pecuario IV
+(9, 186), -- Producción de Peces y Acuacultura
+(9, 187), -- Procesamiento y Conservación de Productos Pecuarios
+(9, 188), -- Gestión Ambiental Pecuaria
+(9, 189), -- Administración de la Producción Animal
+(9, 190), -- Innovación Tecnológica Pecuaria
+(9, 191), -- Proyectos de Emprendimiento Pecuario
+(9, 192); -- Prácticas Profesionales Pecuarias
+
+-- Docente 10 (Elena Ruiz) - Carrera 4 (Agropecuario)
+INSERT INTO docentes_materias (docente_id, materia_id) VALUES
+(10, 8),   -- Introducción a las Ciencias Agropecuarias
+(10, 35),  -- Zootecnia General
+(10, 36),  -- Agronomía Básica
+(10, 37),  -- Ecología y Medio Ambiente
+(10, 38),  -- Manejo de Recursos Naturales
+(10, 39),  -- Maquinaria Agropecuaria
+(10, 40),  -- Prácticas Integrales de Campo
+(10, 75),  -- Manejo Integral de Cultivos
+(10, 76),  -- Producción Animal Sostenible
+(10, 77),  -- Agroecología
+(10, 78),  -- Economía y Comercialización Agropecuaria
+(10, 79),  -- Sistemas de Producción Rural
+(10, 80),  -- Prácticas Agropecuarias Integradas I
+(10, 114), -- Producción Sustentable de Cultivos
+(10, 115), -- Producción Animal Intensiva
+(10, 116), -- Manejo de Recursos Hidráulicos
+(10, 117), -- Economía Rural y Mercados Agropecuarios
+(10, 118), -- Gestión Ambiental Agropecuaria
+(10, 119), -- Innovación Tecnológica en el Campo
+(10, 120), -- Prácticas Agropecuarias Integradas II
+(10, 154), -- Tecnologías Sustentables de Producción
+(10, 155), -- Gestión Empresarial Agropecuaria
+(10, 157), -- Innovación y Transferencia de Tecnología
+(10, 158), -- Comercialización y Cadenas Productivas
+(10, 159), -- Normatividad Ambiental y Agropecuaria
+(10, 160), -- Prácticas Agropecuarias Integradas III
+(10, 194), -- Gestión Integral de Unidades de Producción
+(10, 195), -- Emprendimiento Agropecuario
+(10, 196), -- Sistemas Agroecológicos Sustentables
+(10, 197), -- Planeación Estratégica en el Campo
+(10, 198), -- Innovación y Tecnología Rural
+(10, 199), -- Normas de Inocuidad Agroalimentaria
+(10, 200); -- Prácticas Profesionales Agropecuarias
