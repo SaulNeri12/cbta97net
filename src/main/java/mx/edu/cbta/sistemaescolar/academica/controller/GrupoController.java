@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +135,8 @@ public class GrupoController {
 
     /**
      * Valida si una clase puede ser creada basada en la disponibilidad del aula y docente, ademas de la verificacion
-     * de existencia de sus datos en el sistema.
+     * de existencia de sus datos en el sistema. Ademas, evalua si los horarios en que se llevan en la clase acompletan
+     * las horas por semana para dicha clase.
      * @param claseDTO
      * @throws GrupoException
      * @throws AulaNoDisponibleException
@@ -144,6 +146,13 @@ public class GrupoController {
         // Verificar si la materia existe
         Optional.ofNullable(materiaService.obtenerMateriaPorId(claseDTO.getMateriaId()))
                 .orElseThrow(() -> new GrupoException("La materia de la clase no existe."));
+
+        Materia materia = materiaService.obtenerMateriaPorId(claseDTO.getMateriaId());
+        if (materia == null) {
+            throw new GrupoException("La materia de la clase no existe.");
+        }
+
+        long totalMinutosAsignados = 0;
 
         for (Horario horario : claseDTO.getHorarios()) {
 
@@ -160,6 +169,49 @@ public class GrupoController {
             if (!aulaDisponible) {
                 throw new AulaNoDisponibleException("El aula no se encuentra disponible en el horario especificado.");
             }
+
+            long duracionEnMinutos = Duration.between(horario.getHoraInicio(), horario.getHoraFin()).toMinutes();
+
+            if (duracionEnMinutos <= 0) {
+                throw new GrupoException("La duración de un bloque de horario no puede ser cero.");
+            }
+
+            totalMinutosAsignados += duracionEnMinutos;
+        }
+
+        validarHorasPorSemana(materia, totalMinutosAsignados);
+    }
+
+    /**
+     * Evalua si los minutos (horas) en que se lleva la materia durante la semana, acompletan las horas
+     * requeridas por semana para dicha materia.
+     * @param materia Materia a evaluar.
+     * @param totalMinutosAsignados Tiempo en minutos que se da para impartir la clase de dicha materia.
+     * @throws GrupoException Si no se cumple con las horas requeridas.
+     */
+    private void validarHorasPorSemana(Materia materia, long totalMinutosAsignados) throws GrupoException {
+        long minutosRequeridosPorMateria = materia.getHorasPorSemana() * 60L;
+
+        double horasAsignadas = totalMinutosAsignados / 60.0;
+
+        if (totalMinutosAsignados < minutosRequeridosPorMateria) {
+            throw new GrupoException(
+                    String.format(
+                            "Las horas asignadas (%.2f) son menos que las horas por semana requeridas para la materia (%d).",
+                            horasAsignadas,
+                            materia.getHorasPorSemana()
+                    )
+            );
+        }
+
+        if (totalMinutosAsignados > minutosRequeridosPorMateria) {
+            throw new GrupoException(
+                    String.format(
+                            "Las horas asignadas (%.2f) son más que las horas por semana requeridas para la materia (%d).",
+                            horasAsignadas,
+                            materia.getHorasPorSemana()
+                    )
+            );
         }
     }
 }

@@ -3,7 +3,10 @@ package mx.edu.cbta.sistemaescolar.academica.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @Embeddable
@@ -35,5 +38,15 @@ public class Horario {
 
         return this.horaInicio.isBefore(otro.getHoraFin()) &&
                 this.horaFin.isAfter(otro.getHoraInicio());
+    }
+
+    @Override
+    public String toString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return String.format("%s [%s - %s]",
+                dia,
+                horaInicio.format(formatter),
+                horaFin.format(formatter)
+        );
     }
 }

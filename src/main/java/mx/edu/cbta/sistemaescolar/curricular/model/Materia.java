@@ -24,6 +24,9 @@ public class Materia {
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
+    @Column(name = "horas_por_semana", nullable = false)
+    private int horasPorSemana;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "grado", nullable = false)
     private Grado semestre;

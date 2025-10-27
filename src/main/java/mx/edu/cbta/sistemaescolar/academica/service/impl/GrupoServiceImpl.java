@@ -6,12 +6,11 @@ import mx.edu.cbta.sistemaescolar.academica.model.Grupo;
 import mx.edu.cbta.sistemaescolar.academica.repository.GrupoRepository;
 import mx.edu.cbta.sistemaescolar.academica.service.GrupoService;
 import mx.edu.cbta.sistemaescolar.academica.service.exceptions.GrupoException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class GrupoServiceImpl implements GrupoService {
@@ -43,6 +42,12 @@ public class GrupoServiceImpl implements GrupoService {
             // Toda la lógica compleja de buscar por ID y ensamblar objetos desaparece.
             Grupo grupo = grupoMapper.toEntity(dto);
 
+            // verificar que no hay un grupo con la misma letra para esa ciclo escolar.
+            Grupo grupoConLetra = grupoRepository.findBySemestreAndLetraAndCicloEscolar(grupo.getSemestre(), grupo.getLetra(), grupo.getCicloEscolar());
+            if (grupoConLetra != null) {
+                throw new GrupoException(String.format("Ya existe un grupo del mismo grado con la letra '%c' en este ciclo escolar.", grupoConLetra.getLetra()));
+            }
+
             // 5. Establecer la relación bidireccional.
             // Esto es crucial para que JPA entienda que las clases pertenecen a este grupo.
             if (grupo.getClases() != null) {
@@ -57,7 +62,7 @@ public class GrupoServiceImpl implements GrupoService {
             // El catch ahora puede dar más detalles si algo sale mal (ej. un ID no existe)
             //throw new GrupoException("Error al crear el grupo con clases: " + e.getMessage());
             e.printStackTrace();
-            throw new GrupoException("Error al crear el grupo con clases. Verifique los logs para más detalles.");
+            throw new GrupoException(e.getMessage());
         }
     }
 
