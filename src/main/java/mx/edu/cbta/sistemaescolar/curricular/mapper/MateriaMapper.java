@@ -15,6 +15,9 @@ public interface MateriaMapper {
     @Mapping(source = "carreraTecnica.nombre", target = "carreraTecnicaNombre")
     @Mapping(source = "areaPropedeutica.id", target = "areaPropedeuticaId")
     @Mapping(source = "areaPropedeutica.nombre", target = "areaPropedeuticaNombre")
+    @Mapping(source = "horasPorSemana", target = "horasPorSemana")
+
+
     MateriaDTO toDto(Materia materia);
 
     @Mapping(target = "carreraTecnica", ignore = true)

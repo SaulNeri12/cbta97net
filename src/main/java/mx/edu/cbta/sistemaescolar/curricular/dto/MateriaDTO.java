@@ -8,6 +8,7 @@ public class MateriaDTO {
     private Long id;
     private String nombre;
     private Grado semestre;
+    private int horasPorSemana;
 
     // Aplanamos las relaciones
     private Long carreraTecnicaId;

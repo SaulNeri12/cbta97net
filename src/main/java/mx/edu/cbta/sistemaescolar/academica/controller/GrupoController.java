@@ -162,7 +162,10 @@ public class GrupoController {
 
             boolean docenteDisponible = this.docenteService.docenteDisponibleEnHorario(claseDTO.getDocenteId(), horario);
             if (!docenteDisponible) {
-                throw new DocenteException("El docente no está disponible en el horario especificado.");
+                Docente docente = docenteService.obtenerDocentePorId(claseDTO.getDocenteId());
+                String nombreDocente = docente != null ? docente.getNombre() + " " + docente.getApellidoPaterno() + " " + docente.getApellidoMaterno() :
+                        "Docente ID " + claseDTO.getDocenteId();
+                throw new DocenteException("El docente " + nombreDocente + " no está disponible en el horario especificado.");
             }
 
             boolean aulaDisponible = this.aulaService.aulaDisponibleEnHorario(claseDTO.getAulaId(), horario);
