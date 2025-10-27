@@ -12,9 +12,14 @@ import mx.edu.cbta.sistemaescolar.academica.service.AulaService;
 import mx.edu.cbta.sistemaescolar.academica.service.GrupoService;
 import mx.edu.cbta.sistemaescolar.academica.service.exceptions.AulaNoDisponibleException;
 import mx.edu.cbta.sistemaescolar.academica.service.exceptions.GrupoException;
+
+
+
+import mx.edu.cbta.sistemaescolar.curricular.model.CicloEscolar;
 import mx.edu.cbta.sistemaescolar.curricular.model.Materia;
+import mx.edu.cbta.sistemaescolar.curricular.service.CicloEscolarService;
 import mx.edu.cbta.sistemaescolar.curricular.service.MateriaService;
-import mx.edu.cbta.sistemaescolar.personal.model.Docente;
+import mx.edu.cbta.sistemaescolar.curricular.service.exception.CicloEscolarNoEncontradoException;
 import mx.edu.cbta.sistemaescolar.personal.service.DocenteService;
 import mx.edu.cbta.sistemaescolar.personal.service.exception.DocenteException;
 
@@ -53,10 +58,22 @@ public class GrupoController {
     @Autowired
     private MateriaService materiaService;
 
+    @Autowired
+    private CicloEscolarService cicloEscolarService;
+
     @PostMapping
     public ResponseEntity<?> crearGrupoConClases(@Valid @RequestBody GrupoDTO grupoNuevoDTO)
             throws GrupoException {
 
+        CicloEscolar cicloActivo;
+
+        try {
+            cicloActivo = this.cicloEscolarService.obtenerCicloEscolarActivo();
+        } catch (CicloEscolarNoEncontradoException e) {
+            throw new GrupoException("No se pudo crear el grupo debido a que no hay un ciclo escolar activo.");
+        }
+
+        /*
         System.out.println("=== DEBUG BACKEND - JSON RECIBIDO ===");
         System.out.println("GrupoDTO completo: " + grupoNuevoDTO);
 
@@ -74,7 +91,7 @@ public class GrupoController {
         }
         System.out.println("=== FIN DEBUG ===");
 
-
+*/
 
         Map<String, String> response = new HashMap<>();
 
