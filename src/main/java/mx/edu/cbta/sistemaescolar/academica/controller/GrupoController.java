@@ -20,6 +20,7 @@ import mx.edu.cbta.sistemaescolar.curricular.model.Materia;
 import mx.edu.cbta.sistemaescolar.curricular.service.CicloEscolarService;
 import mx.edu.cbta.sistemaescolar.curricular.service.MateriaService;
 import mx.edu.cbta.sistemaescolar.curricular.service.exception.CicloEscolarNoEncontradoException;
+import mx.edu.cbta.sistemaescolar.personal.model.Docente;
 import mx.edu.cbta.sistemaescolar.personal.service.DocenteService;
 import mx.edu.cbta.sistemaescolar.personal.service.exception.DocenteException;
 
