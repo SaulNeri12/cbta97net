@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+
 @RequestMapping("/materias")
 public class MateriaController {
 
@@ -59,7 +60,7 @@ public class MateriaController {
     }
 
     @GetMapping("/area/{id}")
-    public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorAreaPropedeutica(@PathVariable Long id) throws MateriaNoEncontradaException    {
+    public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorAreaPropedeutica(@PathVariable Long id) throws MateriaNoEncontradaException {
         List<Materia> materias = materiaService.obtenerTodasPorAreaPropedeutica(id);
         List<MateriaDTO> materiasDTO = materias.stream()
                 .map(materiaMapper::toDto)
@@ -68,8 +69,10 @@ public class MateriaController {
     }
 
     @GetMapping("/grado/{grado}")
-    public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorGrado(@PathVariable Grado grado) {
-        List<Materia> materias = materiaService.obtenerMateriasPorGrado(grado);
+    public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorGrado(@PathVariable Integer grado) {
+
+
+        List<Materia> materias = materiaService.obtenerMateriasPorGrado(intToEnum(grado));
         List<MateriaDTO> materiasDTO = materias.stream()
                 .map(materiaMapper::toDto)
                 .collect(Collectors.toList());
@@ -78,9 +81,13 @@ public class MateriaController {
 
     @GetMapping("/grado/{grado}/carrera/{carreraTecnicaId}")
     public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorGradoYCarrera(
-            @PathVariable Grado grado,
+            @PathVariable Integer grado,
             @PathVariable Long carreraTecnicaId) {
-        List<Materia> materias = materiaService.obtenerMateriasPorGradoYCarrera(grado, carreraTecnicaId);
+
+
+
+
+        List<Materia> materias = materiaService.obtenerMateriasPorGradoYCarrera(intToEnum(grado), carreraTecnicaId);
         List<MateriaDTO> materiasDTO = materias.stream()
                 .map(materiaMapper::toDto)
                 .collect(Collectors.toList());
@@ -89,14 +96,49 @@ public class MateriaController {
 
     @GetMapping("/grado/{grado}/carrera/{carreraTecnicaId}/area/{areaPropedeuticaId}")
     public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorGradoYCarreraYAreaPropedeutica(
-            @PathVariable Grado grado,
+            @PathVariable Integer grado,
             @PathVariable Long carreraTecnicaId,
             @PathVariable Long areaPropedeuticaId
     ) {
-        List<Materia> materias = materiaService.obtenerMateriasPorGradoYCarreraYArea(grado, carreraTecnicaId, areaPropedeuticaId);
+
+
+
+
+        List<Materia> materias = materiaService.obtenerMateriasPorGradoYCarreraYArea(intToEnum(grado), carreraTecnicaId, areaPropedeuticaId);
         List<MateriaDTO> materiasDTO = materias.stream()
                 .map(materiaMapper::toDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(materiasDTO);
     }
+
+
+    private Grado intToEnum(Integer grado) {
+        Grado gradoEnum;
+        switch (grado) {
+            case 1:
+                gradoEnum = Grado.Primer_Semestre;
+                break;
+            case 2:
+                gradoEnum = Grado.Segundo_Semestre;
+                break;
+            case 3:
+                gradoEnum = Grado.Tercer_Semestre;
+                break;
+            case 4:
+                gradoEnum = Grado.Cuarto_Semestre;
+                break;
+            case 5:
+                gradoEnum = Grado.Quinto_Semestre;
+                break;
+            case 6:
+                gradoEnum = Grado.Sexto_Semestre;
+                break;
+            default:
+                gradoEnum = Grado.Primer_Semestre;
+        }
+        return gradoEnum;
+
+
+    }
+
 }
