@@ -88,8 +88,8 @@ def obtener_materias(grado_idx=None, carrera_id=None, area_id=None):
     global MATERIAS
     # ... (Se mantiene la misma función de la pregunta anterior)
     url = MATERIAS_URL
-    if grado_idx is not None and 0 <= grado_idx < len(SEMESTRES):
-        url += f"/grado/{SEMESTRES[grado_idx]}"
+    if grado_idx is not None and 1 <= grado_idx < len(SEMESTRES):
+        url += f"/grado/{grado_idx}"
         if carrera_id is not None and carrera_id > 0: url += f"/carrera/{carrera_id}"
         if area_id is not None and area_id > 0: url += f"/area/{area_id}"
     elif area_id is not None and area_id > 0: url += f"/area/{area_id}"
@@ -132,7 +132,7 @@ def crear_y_enviar_grupo():
 
     # 1. Recopilar datos básicos del grupo
     mostrar_semestres()
-    grado_idx = int(input("Selecciona el índice del semestre: "))
+    grado_idx = int(input("Selecciona el índice del semestre (1 - 6): "))
     letra = input("Introduce la letra del grupo (ej. A, B): ").upper()
     turno = input("Introduce el turno (MATUTINO o VESPERTINO): ").upper()
     #ciclo_id = int(input("Introduce el ID del ciclo escolar: "))
@@ -192,7 +192,30 @@ def crear_y_enviar_grupo():
                 "horaFin": hora_fin
             }]
         }
-        clases_para_grupo.append(nueva_clase)
+
+        try:
+            response = requests.post(f"{URL_BASE}/grupos/validar-clase", json=nueva_clase)
+            response.raise_for_status() # Lanza excepción para errores 4xx/5xx
+            #print("\n¡ÉXITO! Grupo creado correctamente.")
+            print("Respuesta del servidor:")
+            print(response.json())
+            clases_para_grupo.append(nueva_clase)
+        except requests.exceptions.RequestException as e:
+            print("\n[=!=] ❌ ERROR al crear la clase")
+            # Si hay respuesta del servidor (por ejemplo, un 400 o 500)
+            if hasattr(e, "response") and e.response is not None:
+                print(f"→ Código HTTP: {e.response.status_code}")
+                try:
+                    error_json = e.response.json()
+                    print("→ Detalles del error (JSON):", json.dumps(error_json, indent=4, ensure_ascii=False))
+                except ValueError:
+                    print("→ Detalles del error (texto):", e.response.text)
+            else:
+                # Si fue un error de conexión o timeout
+                print("→ No se recibió respuesta del servidor.")
+                print(f"→ Detalles: {e}")
+
+            continue # volver al inicio del bucle
         
         if input("¿Añadir otra clase? (s/n): ").lower() != 's':
             break
@@ -202,7 +225,7 @@ def crear_y_enviar_grupo():
         "nota": nota,
         "letra": letra,
         "activo": True,
-        "semestre": SEMESTRES[grado_idx],
+        "semestre": grado_idx,
         "turno": turno,
         "cicloEscolarId": CICLO_ESCOLAR_ACTIVO_ID,
         "carreraTecnicaId": carrera_id,
