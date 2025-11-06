@@ -496,3 +496,48 @@ hr {
         width: 100%;
     }
 }
+
+
+
+.custom-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.4);
+  z-index: 99999;
+}
+
+.custom-modal-box {
+  width: 360px;
+  max-width: calc(100% - 40px);
+  background: #fff;
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+.custom-modal-box p { margin: 0 0 14px 0; color: #222; }
+
+.custom-modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+.custom-modal-box button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.custom-modal-box.confirm .custom-modal-yes {
+  background: #0078d4; color: #fff;
+}
+
+.custom-modal-box.confirm .custom-modal-no {
+  background: #9aa0a6; color: #fff;
+}
+
+.custom-modal-box .custom-modal-ok {
+  background: #0078d4; color: white;
+}

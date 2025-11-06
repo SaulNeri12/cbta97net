@@ -31,7 +31,7 @@ function abrirModalConMateria(materiaId, materiaNombre) {
 
   const assignedList = document.getElementById("assigned-materials-list");
   const existingMateria = assignedList.querySelector(`li[data-materia-id="${materiaId}"]`);
-  
+
   if (existingMateria) {
     abrirModalParaLi(existingMateria);
     return;
@@ -160,9 +160,11 @@ async function validarCreacionGrupo() {
     });
 
     if (clasesValidas.length === 0) {
-      alert(
-        "No hay clases válidas para enviar. Verifica que todas las materias tengan ID correcto."
-      );
+      // alert(
+      //   "No hay clases válidas para enviar. Verifica que todas las materias tengan ID correcto."
+      // );
+      mostrarModal("No hay clases válidas para enviar. Verifica que todas las materias tengan ID correcto.");
+
       return;
     }
 
@@ -171,7 +173,18 @@ async function validarCreacionGrupo() {
       letraGrupo.length !== 1 ||
       !/^[A-Za-z]$/.test(letraGrupo)
     ) {
-      alert("Debe ingresar una letra válida para el grupo.");
+      // alert("Debe ingresar una letra válida para el grupo.");
+      mostrarModal("Debe ingresar una letra válida para el grupo.");
+
+      return;
+    }
+
+    if (
+      !nombreGrupo ||
+      nombreGrupo.length > 100 ||
+      /\.com|http|www/i.test(nombreGrupo)
+    ) {
+      mostrarModal("El nombre del grupo no puede tener más de 100 caracteres ni contener enlaces.");
       return;
     }
 
@@ -237,7 +250,9 @@ async function validarCreacionGrupo() {
     }
 
     const grupoCreado = await response.json();
-    alert("Grupo creado correctamente.");
+    // alert("Grupo creado correctamente.");
+    mostrarModal("Grupo Creado Correctamente");
+
     location.reload();
   } catch (error) {
     console.error("Error al crear el grupo:", error);
@@ -328,77 +343,78 @@ function initializeModalLogic(scheduleBody, modal, materialsList) {
 
 
 
-materialsList.addEventListener("click", (event) => {
-  const target = event.target;
-  const li = target.closest("li");
-  
-  console.log("=== DEBUG CLICK ===");
-  console.log("Target:", target);
-  console.log("Target classList:", target.classList);
-  console.log("LI encontrado:", li);
-  console.log("=== FIN DEBUG ===");
+  materialsList.addEventListener("click", async (event) => {
+    const target = event.target;
+    const li = target.closest("li");
 
-  if (!li) return;
+    console.log("=== DEBUG CLICK ===");
+    console.log("Target:", target);
+    console.log("Target classList:", target.classList);
+    console.log("LI encontrado:", li);
+    console.log("=== FIN DEBUG ===");
 
-  // Verificar si es botón de agregar horario
-  if (target.classList.contains("add-btn") || target.closest(".add-btn")) {
-    console.log("Clic en add-btn");
-    abrirModalParaLi(li);
-    return;
-  }
+    if (!li) return;
 
-  if (target.classList.contains("delete-btn") || target.closest(".delete-btn")) {
-    console.log("Clic en delete-btn");
-    if (!confirm("¿Eliminar esta clase del horario?")) return;
-    
-    const materiaId = li.dataset.materiaId;
-    const materiaNombre = li.dataset.materiaNombre;
-    
-    if (materiaNombre) {
-      const celdas = scheduleBody.querySelectorAll(`td[data-materia="${materiaNombre}"]`);
-      celdas.forEach((c) => {
-        c.classList.remove("class-scheduled");
-        c.removeAttribute("data-materia");
-        c.innerHTML = "";
-      });
+    // Verificar si es botón de agregar horario
+    if (target.classList.contains("add-btn") || target.closest(".add-btn")) {
+      console.log("Clic en add-btn");
+      abrirModalParaLi(li);
+      return;
     }
-    
-    const materiasList = document.getElementById("materias-list");
-    if (materiasList && materiaId && materiaNombre) {
-      const existingMateria = materiasList.querySelector(`.materia-item[data-materia-id="${materiaId}"]`);
-      if (!existingMateria) {
-        const materiaItem = document.createElement("div");
-        materiaItem.className = "materia-item";
-        materiaItem.dataset.materiaId = materiaId;
-        materiaItem.dataset.materiaNombre = materiaNombre;
-        materiaItem.textContent = materiaNombre;
 
-        materiaItem.addEventListener("click", () => {
-          abrirModalConMateria(materiaId, materiaNombre);
+    if (target.classList.contains("delete-btn") || target.closest(".delete-btn")) {
+      console.log("Clic en delete-btn");
+      // if (!confirm("¿Eliminar esta clase del horario?")) return;
+      const proceed = await mostrarModalConfirmacionAsync("¿Eliminar esta clase del horario?");
+      if (!proceed) return;
+      const materiaId = li.dataset.materiaId;
+      const materiaNombre = li.dataset.materiaNombre;
+
+      if (materiaNombre) {
+        const celdas = scheduleBody.querySelectorAll(`td[data-materia="${materiaNombre}"]`);
+        celdas.forEach((c) => {
+          c.classList.remove("class-scheduled");
+          c.removeAttribute("data-materia");
+          c.innerHTML = "";
         });
-
-        if (materiasList.innerHTML.includes('No hay más materias disponibles')) {
-          materiasList.innerHTML = '';
-        }
-        
-        materiasList.appendChild(materiaItem);
       }
+
+      const materiasList = document.getElementById("materias-list");
+      if (materiasList && materiaId && materiaNombre) {
+        const existingMateria = materiasList.querySelector(`.materia-item[data-materia-id="${materiaId}"]`);
+        if (!existingMateria) {
+          const materiaItem = document.createElement("div");
+          materiaItem.className = "materia-item";
+          materiaItem.dataset.materiaId = materiaId;
+          materiaItem.dataset.materiaNombre = materiaNombre;
+          materiaItem.textContent = materiaNombre;
+
+          materiaItem.addEventListener("click", () => {
+            abrirModalConMateria(materiaId, materiaNombre);
+          });
+
+          if (materiasList.innerHTML.includes('No hay más materias disponibles')) {
+            materiasList.innerHTML = '';
+          }
+
+          materiasList.appendChild(materiaItem);
+        }
+      }
+
+      li.remove();
+      return;
     }
-    
-    li.remove();
-    return;
-  }
 
-  if (target.classList.contains("edit-btn") || target.closest(".edit-btn")) {
-    console.log("Clic en edit-btn");
-    abrirModalParaLi(li);
-    return;
-  }
+    if (target.classList.contains("edit-btn") || target.closest(".edit-btn")) {
+      console.log("Clic en edit-btn");
+      abrirModalParaLi(li);
+      return;
+    }
 
-  if (li.classList.contains("materia-asignada")) {
-    abrirModalParaLi(li);
-  }
-});
+    if (li.classList.contains("materia-asignada")) {
+      abrirModalParaLi(li);
+    }
+  });
 
 
 
@@ -439,78 +455,81 @@ materialsList.addEventListener("click", (event) => {
     }
   });
 
- if (addHorarioBtn) {
-  addHorarioBtn.addEventListener("click", async () => {
-    const diaSelect = modal.querySelector("#horario-dia");
-    const inicio = modal.querySelector("#horario-inicio");
-    const fin = modal.querySelector("#horario-fin");
-    const docenteSelect = modal.querySelector("#modal-docente");
-    const aulaSelect = modal.querySelector("#modal-aula");
+  if (addHorarioBtn) {
+    addHorarioBtn.addEventListener("click", async () => {
+      const diaSelect = modal.querySelector("#horario-dia");
+      const inicio = modal.querySelector("#horario-inicio");
+      const fin = modal.querySelector("#horario-fin");
+      const docenteSelect = modal.querySelector("#modal-docente");
+      const aulaSelect = modal.querySelector("#modal-aula");
 
-    if (!inicio.value || !fin.value) {
-      alert("Selecciona inicio y fin de horario");
-      return;
-    }
+      if (!inicio.value || !fin.value) {
+        alert("Selecciona inicio y fin de horario");
+        return;
+      }
 
-    const inicioHora = parseInt(inicio.value.split(':')[0]);
-    const finHora = parseInt(fin.value.split(':')[0]);
+      const inicioHora = parseInt(inicio.value.split(':')[0]);
+      const finHora = parseInt(fin.value.split(':')[0]);
 
-    if (inicioHora >= finHora) {
-      alert("Rango de horas inválido");
-      return;
-    }
+      if (inicioHora >= finHora) {
+        alert("Rango de horas inválido");
+        return;
+      }
 
-    if (!docenteSelect.value || docenteSelect.value === "") {
-      alert("Debe seleccionar un docente antes de agregar horarios");
-      return;
-    }
+      if (!docenteSelect.value || docenteSelect.value === "") {
+        alert("Debe seleccionar un docente antes de agregar horarios");
+        return;
+      }
 
-    if (!aulaSelect.value || aulaSelect.value === "") {
-      alert("Debe seleccionar un aula antes de agregar horarios");
-      return;
-    }
+      if (!aulaSelect.value || aulaSelect.value === "") {
+        // alert("Debe seleccionar un aula antes de agregar horarios");
+       mostrarModal("Debe seleccionar un aula antes de agregar horarios");
+        return;
+      }
 
-    const materiaId = materiaActualLi ? materiaActualLi.dataset.materiaId : null;
-    if (!materiaId) {
-      alert("Error: No se pudo identificar la materia");
-      return;
-    }
+      const materiaId = materiaActualLi ? materiaActualLi.dataset.materiaId : null;
+      if (!materiaId) {
+        alert("Error: No se pudo identificar la materia");
+        return;
+      }
 
-    const nuevoHorario = {
-      dia: parseInt(diaSelect.value),
-      horaInicio: inicioHora,
-      horaFin: finHora,
-      aulaId: parseInt(aulaSelect.value),
-      docenteId: parseInt(docenteSelect.value)
-    };
+      const nuevoHorario = {
+        dia: parseInt(diaSelect.value),
+        horaInicio: inicioHora,
+        horaFin: finHora,
+        aulaId: parseInt(aulaSelect.value),
+        docenteId: parseInt(docenteSelect.value)
+      };
 
-    const horariosExistentes = obtenerHorariosExistentesDeTabla(horariosListBody, nuevoHorario.aulaId, nuevoHorario.docenteId);
-    const conflictosLocales = verificarConflictosLocales(horariosExistentes, nuevoHorario);
+      const horariosExistentes = obtenerHorariosExistentesDeTabla(horariosListBody, nuevoHorario.aulaId, nuevoHorario.docenteId);
+      const conflictosLocales = verificarConflictosLocales(horariosExistentes, nuevoHorario);
 
-    if (conflictosLocales.length > 0) {
-      const mensajes = conflictosLocales.map(c => c.mensaje).join('\n');
-      alert(`CONFLICTOS EN EL GRUPO ACTUAL:\n${mensajes}\n\nPor favor, seleccione otro horario, aula o docente.`);
-      return;
-    }
+      if (conflictosLocales.length > 0) {
+        const mensajes = conflictosLocales.map(c => c.mensaje).join('\n');
+        // alert(`CONFLICTOS EN EL GRUPO ACTUAL:\n${mensajes}\n\nPor favor, seleccione otro horario, aula o docente.`);
+        mostrarModal(`CONFLICTOS EN EL GRUPO ACTUAL:\n${mensajes}\n\nPor favor, seleccione otro horario, aula o docente.`);
+
+        return;
+      }
 
 
-    const row = document.createElement("tr");
-    const dayText = diaSelect.options[diaSelect.selectedIndex].text;
-    row.innerHTML = `
+      const row = document.createElement("tr");
+      const dayText = diaSelect.options[diaSelect.selectedIndex].text;
+      row.innerHTML = `
       <td data-day-value="${diaSelect.value}">${dayText}</td>
       <td>${inicioHora}:00</td>
       <td>${finHora}:00</td>
       <td><button type="button" class="delete-horario-btn">borrar</button></td>
     `;
-    horariosListBody.appendChild(row);
+      horariosListBody.appendChild(row);
 
-    // alert(" Horario agregado correctamente");
+      // alert(" Horario agregado correctamente");
 
-    inicio.value = "07:00";
-    fin.value = "08:00";
-    diaSelect.selectedIndex = 0;
-  });
-}
+      inicio.value = "07:00";
+      fin.value = "08:00";
+      diaSelect.selectedIndex = 0;
+    });
+  }
 
 
 
@@ -527,182 +546,185 @@ materialsList.addEventListener("click", (event) => {
     });
   }
 
-if (confirmBtn) {
-  confirmBtn.addEventListener("click", async () => {
-       if (!materiaActualLi) {
-      alert("Error interno: materia no seleccionada.");
-      return;
-    }
+  if (confirmBtn) {
+    confirmBtn.addEventListener("click", async () => {
+      if (!materiaActualLi) {
+        alert("Error interno: materia no seleccionada.");
+        return;
+      }
 
-    const materia = modalMateriaName.value.trim();
-    const docente = modalDocente.value.trim();
-    const aula = modalAula.value.trim();
+      const materia = modalMateriaName.value.trim();
+      const docente = modalDocente.value.trim();
+      const aula = modalAula.value.trim();
 
-    if (!docente || docente === "" || docente === "undefined") {
-      alert("Debe seleccionar un docente válido");
-      return;
-    }
+      if (!docente || docente === "" || docente === "undefined") {
+        // alert("Debe seleccionar un docente válido");
+        mostrarModal("Debe seleccionar un docente válido");
+        return;
+      }
 
-    if (!aula || aula === "" || aula === "undefined") {
-      alert("Debe seleccionar un aula válida");
-      return;
-    }
+      if (!aula || aula === "" || aula === "undefined") {
+        alert("Debe seleccionar un aula válida");
+        return;
+      }
 
-    const horariosRows = horariosListBody.querySelectorAll("tr");
+      const horariosRows = horariosListBody.querySelectorAll("tr");
 
-    if (horariosRows.length === 0) {
-      alert("Agrega al menos un horario");
-      return;
-    }
+      if (horariosRows.length === 0) {
+        // alert("Agrega al menos un horario");
+        mostrarModal("Agrega al menos un horario");
 
-    let hayErroresBloqueantes = false;
+        return;
+      }
 
-    try {
-      const materiaId = materiaActualLi.dataset.materiaId;
-      
-      const claseDTO = {
-        materiaId: parseInt(materiaId),
-        docenteId: parseInt(docente),
-        aulaId: parseInt(aula),
-        horarios: Array.from(horariosRows).map(row => ({
-          dia: parseInt(row.cells[0].dataset.dayValue),
-          horaInicio: `${parseInt(row.cells[1].textContent.split(":")[0]).toString().padStart(2, '0')}:00:00`,
-          horaFin: `${parseInt(row.cells[2].textContent.split(":")[0]).toString().padStart(2, '0')}:00:00`
-        }))
-      };
+      let hayErroresBloqueantes = false;
 
-      console.log("Validando clase completa antes de confirmar:", claseDTO);
+      try {
+        const materiaId = materiaActualLi.dataset.materiaId;
 
-      const response = await fetch('http://localhost:8080/grupos/validar-clase', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(claseDTO)
-      });
+        const claseDTO = {
+          materiaId: parseInt(materiaId),
+          docenteId: parseInt(docente),
+          aulaId: parseInt(aula),
+          horarios: Array.from(horariosRows).map(row => ({
+            dia: parseInt(row.cells[0].dataset.dayValue),
+            horaInicio: `${parseInt(row.cells[1].textContent.split(":")[0]).toString().padStart(2, '0')}:00:00`,
+            horaFin: `${parseInt(row.cells[2].textContent.split(":")[0]).toString().padStart(2, '0')}:00:00`
+          }))
+        };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        const errorMessage = errorData.error || errorData.message || 'Error en la validación';
-          
-        if (errorMessage.includes("horas asignadas") || 
+        console.log("Validando clase completa antes de confirmar:", claseDTO);
+
+        const response = await fetch('http://localhost:8080/grupos/validar-clase', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(claseDTO)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          const errorMessage = errorData.error || errorData.message || 'Error en la validación';
+
+          if (errorMessage.includes("horas asignadas") ||
             errorMessage.includes("horas por semana") ||
             errorMessage.includes("horas requeridas")) {
-          
-          const continuar = confirm(`  ADVERTENCIA DE HORAS:\n\n${errorMessage}\n\n¿Desea continuar con la creación de la clase de todas formas?\n\n(Puede agregar las horas faltantes más tarde)`);
-          
-          if (!continuar) {
-            return; 
+
+            const continuar = await mostrarModalConfirmacionAsync(`ADVERTENCIA DE HORAS:\n\n${errorMessage}\n\n¿Desea continuar con la creación de la clase de todas formas?`);
+            if (!continuar) return;
+
           }
-          
-        } 
-        else if (errorMessage.includes("docente no está disponible") ||
-                 errorMessage.includes("Docente no está disponible")) {
-          alert(` CONFLICTO DE DOCENTE:\n${errorMessage}\n\nPor favor, seleccione otro docente u horario.`);
-          hayErroresBloqueantes = true;
-          return;
-        } else if (errorMessage.includes("aula no se encuentra disponible") ||
-                   errorMessage.includes("Aula no se encuentra disponible")) {
-          alert(` CONFLICTO DE AULA:\n${errorMessage}\n\nPor favor, seleccione otra aula u horario.`);
-          hayErroresBloqueantes = true;
-          return;
-        } else {
-          alert(` ERROR:\n${errorMessage}\n\nPor favor, verifique los datos e intente nuevamente.`);
-          hayErroresBloqueantes = true;
-          return;
-        }
-      }
-      
-      console.log(" Validación del backend exitosa");
-      
-    } catch (error) {
-      console.error('Error en validación final:', error);
-      alert(' Error al validar la clase con el servidor. Intente nuevamente.');
-      return;
-    }
-
-    if (hayErroresBloqueantes) {
-      return;
-    }
-
-    const docenteSelect = document.getElementById("modal-docente");
-    const aulaSelect = document.getElementById("modal-aula");
-    const docenteNombre = docenteSelect?.options[docenteSelect.selectedIndex]?.text || "Docente";
-    const aulaNombre = aulaSelect?.options[aulaSelect.selectedIndex]?.text || "Aula";
-
-    let conflicto = false;
-    const horariosObjs = [];
-
-    horariosRows.forEach((row) => {
-      const dayValue = parseInt(row.cells[0].dataset.dayValue);
-      const dayText = row.cells[0].textContent.trim();
-      const start = parseInt(row.cells[1].textContent.split(":")[0]);
-      const end = parseInt(row.cells[2].textContent.split(":")[0]);
-
-      horariosObjs.push({ day: dayValue, dayText, start, end });
-
-      for (let h = start; h < end; h++) {
-        const cell = scheduleBody.querySelector(
-          `td[data-day-index="${dayValue}"][data-hour="${h}"]`
-        );
-        if (cell && cell.classList.contains("class-scheduled")) {
-          const existingMateria = cell.dataset.materia;
-          if (existingMateria && existingMateria !== materia) {
-            alert(
-              ` CONFLICTO EN HORARIO:\nYa existe la clase "${existingMateria}" programada el ${dayText} a las ${h}:00.\n\nPor favor, ajuste los horarios.`
-            );
-            conflicto = true;
-            break;
+          else if (errorMessage.includes("docente no está disponible") ||
+            errorMessage.includes("Docente no está disponible")) {
+            alert(` CONFLICTO DE DOCENTE:\n${errorMessage}\n\nPor favor, seleccione otro docente u horario.`);
+            hayErroresBloqueantes = true;
+            return;
+          } else if (errorMessage.includes("aula no se encuentra disponible") ||
+            errorMessage.includes("Aula no se encuentra disponible")) {
+            alert(` CONFLICTO DE AULA:\n${errorMessage}\n\nPor favor, seleccione otra aula u horario.`);
+            hayErroresBloqueantes = true;
+            return;
+          } else {
+            alert(` ERROR:\n${errorMessage}\n\nPor favor, verifique los datos e intente nuevamente.`);
+            hayErroresBloqueantes = true;
+            return;
           }
         }
+
+        console.log(" Validación del backend exitosa");
+
+      } catch (error) {
+        console.error('Error en validación final:', error);
+        alert(' Error al validar la clase con el servidor. Intente nuevamente.');
+        return;
       }
-      if (conflicto) return;
-    });
 
-    if (conflicto) return;
+      if (hayErroresBloqueantes) {
+        return;
+      }
 
-    const materiaAnterior = materiaActualLi.dataset.materiaNombre;
-    if (materiaAnterior) {
-      const prevCells = scheduleBody.querySelectorAll(
-        `td[data-materia="${materiaAnterior}"]`
-      );
-      prevCells.forEach((cell) => {
-        cell.classList.remove("class-scheduled");
-        cell.removeAttribute("data-materia");
-        cell.innerHTML = "";
+      const docenteSelect = document.getElementById("modal-docente");
+      const aulaSelect = document.getElementById("modal-aula");
+      const docenteNombre = docenteSelect?.options[docenteSelect.selectedIndex]?.text || "Docente";
+      const aulaNombre = aulaSelect?.options[aulaSelect.selectedIndex]?.text || "Aula";
+
+      let conflicto = false;
+      const horariosObjs = [];
+
+      horariosRows.forEach((row) => {
+        const dayValue = parseInt(row.cells[0].dataset.dayValue);
+        const dayText = row.cells[0].textContent.trim();
+        const start = parseInt(row.cells[1].textContent.split(":")[0]);
+        const end = parseInt(row.cells[2].textContent.split(":")[0]);
+
+        horariosObjs.push({ day: dayValue, dayText, start, end });
+
+        for (let h = start; h < end; h++) {
+          const cell = scheduleBody.querySelector(
+            `td[data-day-index="${dayValue}"][data-hour="${h}"]`
+          );
+          if (cell && cell.classList.contains("class-scheduled")) {
+            const existingMateria = cell.dataset.materia;
+            if (existingMateria && existingMateria !== materia) {
+              // alert(
+              //   ` CONFLICTO EN HORARIO:\nYa existe la clase "${existingMateria}" programada el ${dayText} a las ${h}:00.\n\nPor favor, ajuste los horarios.`
+              // );
+              mostrarModal(`CONFLICTO EN HORARIO:\nYa existe la clase "${existingMateria}" programada el ${dayText} a las ${h}:00.\n\nPor favor, ajuste los horarios`);
+
+
+              conflicto = true;
+              break;
+            }
+          }
+        }
+        if (conflicto) return;
       });
-    }
 
-    horariosObjs.forEach((h) => {
-      for (let hh = h.start; hh < h.end; hh++) {
-        const cell = scheduleBody.querySelector(
-          `td[data-day-index="${h.day}"][data-hour="${hh}"]`
+      if (conflicto) return;
+
+      const materiaAnterior = materiaActualLi.dataset.materiaNombre;
+      if (materiaAnterior) {
+        const prevCells = scheduleBody.querySelectorAll(
+          `td[data-materia="${materiaAnterior}"]`
         );
-        if (cell) {
+        prevCells.forEach((cell) => {
+          cell.classList.remove("class-scheduled");
+          cell.removeAttribute("data-materia");
           cell.innerHTML = "";
-          cell.className = "";
-          cell.classList.add("class-scheduled");
-          cell.dataset.materia = materia;
+        });
+      }
 
-          const contenido = `
+      horariosObjs.forEach((h) => {
+        for (let hh = h.start; hh < h.end; hh++) {
+          const cell = scheduleBody.querySelector(
+            `td[data-day-index="${h.day}"][data-hour="${hh}"]`
+          );
+          if (cell) {
+            cell.innerHTML = "";
+            cell.className = "";
+            cell.classList.add("class-scheduled");
+            cell.dataset.materia = materia;
+
+            const contenido = `
             <div class="class-content">
               <strong>${materia}</strong><br>
               ${docenteNombre}<br>
               Aula: ${aulaNombre}
             </div>
           `;
-          cell.innerHTML = contenido;
+            cell.innerHTML = contenido;
+          }
         }
-      }
-    });
+      });
 
-    materiaActualLi.dataset.materiaNombre = materia;
-    materiaActualLi.dataset.docente = docente;
-    materiaActualLi.dataset.aula = aula;
-    materiaActualLi.dataset.horarios = JSON.stringify(horariosObjs);
+      materiaActualLi.dataset.materiaNombre = materia;
+      materiaActualLi.dataset.docente = docente;
+      materiaActualLi.dataset.aula = aula;
+      materiaActualLi.dataset.horarios = JSON.stringify(horariosObjs);
 
-    materiaActualLi.classList.add("materia-asignada");
-    materiaActualLi.innerHTML = `
+      materiaActualLi.classList.add("materia-asignada");
+      materiaActualLi.innerHTML = `
       <span class="material-text">${materia}</span>
       <div class="material-actions">
           <span class="material-icons edit-btn" title="Editar">edit</span>
@@ -710,12 +732,12 @@ if (confirmBtn) {
       </div>
     `;
 
-    closeModal();
-    materiaActualLi = null;
-    
-    alert(" Clase asignada correctamente al horario");
-  });
-}
+      closeModal();
+      materiaActualLi = null;
+      mostrarModal("Clase asignada correctamente al horario");
+      // alert(" Clase asignada correctamente al horario");
+    });
+  }
 }
 
 
@@ -900,13 +922,85 @@ function obtenerHorariosExistentesDeTabla(horariosListBody, aulaId, docenteId) {
   return horarios;
 }
 
+function _createOverlay(mensaje, tipo = "info") {
+  const overlay = document.createElement("div");
+  overlay.className = "custom-modal-overlay";
+  overlay.innerHTML = `
+    <div class="custom-modal-box ${tipo}">
+      <p>${mensaje}</p>
+      <div class="custom-modal-actions">
+        <button class="custom-modal-ok" id="custom-modal-ok">Aceptar</button>
+      </div>
+    </div>
+  `;
+  return overlay;
+}
+
+function mostrarModal(mensaje, tipo = "info") {
+  const overlay = _createOverlay(mensaje, tipo);
+  document.body.appendChild(overlay);
+
+  const okBtn = overlay.querySelector(".custom-modal-ok");
+  const remove = () => overlay.remove();
+
+  okBtn.addEventListener("click", remove);
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) remove();
+  });
+}
+
+
+
+
+function mostrarModalConfirmacionAsync(mensaje) {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "custom-modal-overlay";
+    overlay.innerHTML = `
+      <div class="custom-modal-box confirm" id="custom-modal-box-confirm">
+        <p>${mensaje}</p>
+        <div class="custom-modal-actions">
+          <button class="custom-modal-yes">Aceptar</button>
+          <button class="custom-modal-no">Cancelar</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const yes = overlay.querySelector(".custom-modal-yes");
+    const no = overlay.querySelector(".custom-modal-no");
+
+    const cleanup = (value) => {
+      overlay.remove();
+      resolve(value);
+    };
+
+    yes.addEventListener("click", () => cleanup(true));
+    no.addEventListener("click", () => cleanup(false));
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) cleanup(false);
+    });
+  });
+}
+
+window.alert = function (mensaje) {
+  mostrarModal(mensaje, "info");
+};
+
+window.confirm = function (mensaje) {
+  return new Promise(resolve => {
+    mostrarModalConfirmacion(mensaje, () => resolve(true), () => resolve(false));
+  });
+};
+
+
 
 // function abrirModalConMateria(materiaId, materiaNombre) {
 //   console.log("Abriendo modal para materia:", { materiaId, materiaNombre });
 
 //   const assignedList = document.getElementById("assigned-materials-list");
 //   const existingMateria = assignedList.querySelector(`li[data-materia-id="${materiaId}"]`);
-  
+
 //   if (existingMateria) {
 //     abrirModalParaLi(existingMateria);
 //     return;
@@ -937,7 +1031,7 @@ function obtenerHorariosExistentesDeTabla(horariosListBody, aulaId, docenteId) {
 //   abrirModalParaLi(li);
 // }
 function abrirModalParaLi(li) {
-  // ✅ ESTABLECER materiaActualLi PRIMERO
+  //  ESTABLECER materiaActualLi PRIMERO
   materiaActualLi = li;
 
   const modal = document.getElementById("addClassModal");
@@ -953,10 +1047,10 @@ function abrirModalParaLi(li) {
 
   // Limpiar horarios anteriores
   horariosListBody.innerHTML = "";
-  
+
   // Establecer valores del modal
   modalMateriaName.value = li.dataset.materiaNombre || "";
-  
+
   // Cargar docentes para esta materia
   const materiaId = li.dataset.materiaId;
   if (materiaId) {
@@ -1002,7 +1096,7 @@ function abrirModalParaLi(li) {
 
   // Abrir el modal
   modal.classList.add("visible");
-  
+
   console.log("Modal abierto para materia:", li.dataset.materiaNombre);
   console.log("materiaActualLi establecido:", materiaActualLi !== null);
 }
@@ -1208,18 +1302,18 @@ function validarDatosClases(clases) {
 
 function verificarBotonesMaterias() {
   const materiasAsignadas = document.querySelectorAll('#assigned-materials-list li');
-  
+
   materiasAsignadas.forEach(li => {
     const materialActions = li.querySelector('.material-actions');
     const deleteBtn = li.querySelector('.delete-btn');
-    
+
     if (materialActions && !deleteBtn) {
       const deleteButton = document.createElement('span');
       deleteButton.className = 'material-icons delete-btn';
       deleteButton.title = 'Eliminar';
       deleteButton.textContent = 'delete';
       materialActions.appendChild(deleteButton);
-      
+
       console.log('Botón de eliminar agregado a:', li.dataset.materiaNombre);
     }
   });
@@ -1395,7 +1489,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
 
-  
+
 
 
 
@@ -1451,4 +1545,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 });
-
+document.addEventListener("click", (e) => {
+  if (e.target.id === "btn-cancelar-grupo") {
+    location.reload();
+  }
+});
