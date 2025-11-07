@@ -1,26 +1,29 @@
 package mx.edu.cbta.sistemaescolar.academica.controller;
 
-import jakarta.validation.Valid;
-import mx.edu.cbta.sistemaescolar.academica.dto.AulaDTO;
-import mx.edu.cbta.sistemaescolar.academica.dto.AulaDisponibleDTO;
-import mx.edu.cbta.sistemaescolar.academica.mapper.AulaMapper;
-import mx.edu.cbta.sistemaescolar.academica.model.Aula;
-import mx.edu.cbta.sistemaescolar.academica.model.Horario;
-import mx.edu.cbta.sistemaescolar.academica.service.AulaService;
+
 import mx.edu.cbta.sistemaescolar.academica.service.exceptions.AulaNoDisponibleException;
-import mx.edu.cbta.sistemaescolar.personal.dto.DocenteDisponibleDTO;
-import mx.edu.cbta.sistemaescolar.personal.service.exception.DocenteException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import mx.edu.cbta.sistemaescolar.academica.dto.AulaDisponibleDTO;
+import mx.edu.cbta.sistemaescolar.academica.service.AulaService;
+import mx.edu.cbta.sistemaescolar.academica.mapper.AulaMapper;
+import mx.edu.cbta.sistemaescolar.academica.model.Horario;
+import mx.edu.cbta.sistemaescolar.academica.dto.AulaDTO;
+import mx.edu.cbta.sistemaescolar.academica.model.Aula;
+
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import jakarta.validation.Valid;
 
-
+/**
+ * TODO: 1. [ ] Manejar correctamente los codigos de error HTTP de cada respuesta dada por el controlador.
+ * TODO: 2. [ ] Añadir seguridad con Json Web Tokerns para que ningun recurso del controlador sea accedido sin permiso.
+ */
 @RestController
 @RequestMapping("/aulas")
 public class AulaController {
@@ -39,7 +42,6 @@ public class AulaController {
         Aula aulaGuardada = aulaService.registrarAula(aula);
         AulaDTO aulaCreadaDTO = aulaMapper.toDTO(aulaGuardada);
 
-        // Devuelve 201 Created y el DTO en el cuerpo
         return ResponseEntity.status(HttpStatus.CREATED).body(aulaCreadaDTO);
     }
 
@@ -54,6 +56,7 @@ public class AulaController {
 
     @PostMapping("/disponible")
     public ResponseEntity<?> aulaDisponibleEnHorario(@Valid @RequestBody AulaDisponibleDTO infoAula, BindingResult bindingResult) throws AulaNoDisponibleException {
+
         for (Horario horario : infoAula.getHorarios()) {
             boolean aulaDisponible = this.aulaService.aulaDisponibleEnHorario(infoAula.getIdAula(), horario);
             if (!aulaDisponible) {

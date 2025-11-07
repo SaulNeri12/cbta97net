@@ -1,8 +1,8 @@
 package mx.edu.cbta.sistemaescolar.curricular.service;
 
-import mx.edu.cbta.sistemaescolar.curricular.model.Grado;
-import mx.edu.cbta.sistemaescolar.curricular.model.Materia;
 import mx.edu.cbta.sistemaescolar.curricular.service.exception.MateriaNoEncontradaException;
+import mx.edu.cbta.sistemaescolar.curricular.model.Materia;
+import mx.edu.cbta.sistemaescolar.curricular.model.Grado;
 
 import java.util.List;
 
