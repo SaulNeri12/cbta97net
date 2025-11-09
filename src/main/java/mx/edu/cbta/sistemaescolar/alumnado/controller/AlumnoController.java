@@ -49,7 +49,7 @@ public class AlumnoController {
     public ResponseEntity<?> subirDocumento(@PathVariable String matricula,
                                             @RequestParam("file") MultipartFile file,
                                             @RequestParam("tipo") String tipo) throws IOException {
-        
+
         // Convierte el String "FOTO_ALUMNO" al enum TipoDocumentoAlumno.FOTO_ALUMNO
         TipoDocumentoAlumno tipoDoc;
         try {

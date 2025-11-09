@@ -1,7 +1,7 @@
 package mx.edu.cbta.sistemaescolar.alumnado.model;
 
 import mx.edu.cbta.sistemaescolar.academica.model.AlumnoInscrito;
-import mx.edu.cbta.sistemaescolar.personal.model.Docente; // <-- IMPORTANTE
+import mx.edu.cbta.sistemaescolar.personal.model.Docente;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,7 +17,7 @@ public class Alumno {
     @Column(name="matricula", length = 20)
     private String matricula;
 
-    @Column(name="curp", nullable = false, length = 20, unique = true) // <-- Añadido unique
+    @Column(name="curp", nullable = false, length = 20, unique = true)
     private String curp;
 
     @Column(name="nombre", nullable = false, length = 50)
@@ -34,8 +34,8 @@ public class Alumno {
 
     // --- CAMPOS REQUERIDOS AÑADIDOS ---
 
-    @Column(name="nombre_tutor_legal", length = 150)
-    private String nombreTutor; // Nombre del Tutor Legal (simple)
+    // ELIMINADO: @Column(name="nombre_tutor_legal", length = 150)
+    // private String nombreTutor;
 
     @Column(name="nss", length = 20, unique = true)
     private String numeroSeguroSocial;
@@ -50,18 +50,24 @@ public class Alumno {
     @Column(name="condicion_especial_descripcion")
     private String condicionEspecialDescripcion;
 
-    // --- RELACIONES AÑADIDAS ---
+    // --- RELACIONES ACTUALIZADAS ---
 
-    // Relación con Tutor Académico (Docente)
+    // AÑADIDO: Relación con Tutor Legal (Owning side)
+    // CascadeType.ALL hará que el Tutor se guarde automáticamente cuando se guarde el Alumno
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "tutor_legal_id")
+    private Tutor tutorLegal;
+
+    // Relación con Tutor Académico (Docente) - Se mantiene null al crear
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tutor_academico_id")
-    private Docente tutorAcademico; // <-- RELACIÓN AÑADIDA
+    private Docente tutorAcademico;
 
     // Relación con sus documentos
     @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<DocumentoAlumno> documentos;
 
-    // Un alumno puede estar inscrito en varios grupos a lo largo de su historia académica
+    // Relación con sus inscripciones a grupos
     @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL)
     private Set<AlumnoInscrito> inscripciones;
 }

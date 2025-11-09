@@ -12,17 +12,16 @@ public class AlumnoDTO {
     private String nombre;
     private String apellidoPaterno;
     private String apellidoMaterno;
-    private LocalDate fechaNacimiento; // Spring Boot convierte el String "yyyy-MM-dd" a LocalDate
+    private LocalDate fechaNacimiento;
     private String numeroSeguroSocial;
     private String numeroPolizaSeguro;
 
     // --- Datos de Tutoría ---
 
-    // Campo simple para el nombre del Tutor Legal
-    private String nombreTutor;
+    // CAMBIADO: Ahora es un objeto DTO anidado
+    private TutorDTO tutorLegal;
 
-    // ID del Docente que será el Tutor Académico
-    private Long tutorAcademicoId;
+    // ELIMINADO: private Long tutorAcademicoId;
 
     // --- Área Educativa / Condiciones ---
     private boolean condicionEspecial;

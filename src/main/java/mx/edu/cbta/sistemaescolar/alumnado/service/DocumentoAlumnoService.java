@@ -11,19 +11,16 @@ public interface DocumentoAlumnoService {
 
     /**
      * Guarda un documento de cualquier tipo para un alumno.
-     * (Corrige Error 2)
      */
     String guardarDocumento(String matricula, MultipartFile file, TipoDocumentoAlumno tipo) throws IOException;
 
     /**
      * Obtiene un documento de cualquier tipo para un alumno.
-     * (Corrige Error 4)
      */
     Resource obtenerDocumento(String matricula, TipoDocumentoAlumno tipo) throws IOException;
 
     /**
      * Obtiene la información (metadatos) de un documento.
-     * (Corrige Error 3)
      */
     Optional<DocumentoAlumno> getInfoDocumento(String matricula, TipoDocumentoAlumno tipo);
 

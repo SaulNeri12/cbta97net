@@ -6,9 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository // <-- Añadido
+@Repository
 public interface AlumnoRepository extends JpaRepository<Alumno, String> {
 
-    // Método necesario para validación
     Optional<Alumno> findByCurp(String curp);
 }
