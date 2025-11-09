@@ -3,12 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const statusMessage = document.getElementById("status-message");
     const checkCondicion = document.getElementById("condicionEspecial");
     const campoDescCondicion = document.getElementById("campo-descripcion-condicion");
-    const selectTutorAcademico = document.getElementById("tutorAcademico");
 
-    // --- NUEVA LÓGICA PARA VISTA PREVIA DE FOTO ---
+    // Ya no se necesita cargar tutores académicos
+    // const selectTutorAcademico = document.getElementById("tutorAcademico");
+
+    // --- LÓGICA PARA VISTA PREVIA DE FOTO ---
     const fotoInput = document.getElementById("fotoAlumno");
     const fotoPreview = document.getElementById("fotoPreview");
-    const placeholderImage = "placeholder-user.png"; // Ruta a tu imagen placeholder
+    const placeholderImage = "placeholder-user.png";
 
     fotoInput.addEventListener("change", () => {
         const file = fotoInput.files[0];
@@ -19,60 +21,43 @@ document.addEventListener("DOMContentLoaded", () => {
             };
             reader.readAsDataURL(file);
         } else {
-            fotoPreview.src = placeholderImage; 
+            fotoPreview.src = placeholderImage;
         }
     });
     // --- FIN DE LÓGICA DE VISTA PREVIA ---
 
-    
+
     // Lógica para mostrar/ocultar descripción de condición
     checkCondicion.addEventListener("change", () => {
         if (checkCondicion.checked) {
             campoDescCondicion.style.display = "block";
         } else {
             campoDescCondicion.style.display = "none";
-            document.getElementById("condicionDescripcion").value = ""; // Limpiar si se desmarca
+            document.getElementById("condicionDescripcion").value = "";
         }
     });
 
-    // Cargar docentes en el select
-    async function cargarTutoresAcademicos() {
-        try {
-            // Asumimos que cualquier docente puede ser tutor
-            const response = await fetch("http://localhost:8080/docentes/materia/0"); // Se usa /materia/0 como truco para traer todos
-            if (!response.ok) throw new Error("No se pudieron cargar los docentes");
-            
-            const docentes = await response.json();
-            
-            docentes.forEach(docente => {
-                const option = document.createElement("option");
-                option.value = docente.id;
-                option.textContent = `${docente.nombre} ${docente.apellidoPaterno} ${docente.apellidoMaterno}`;
-                selectTutorAcademico.appendChild(option);
-            });
-
-        } catch (error) {
-            console.error(error);
-            selectTutorAcademico.innerHTML = '<option value="">Error al cargar docentes</option>';
-        }
-    }
-    
-    // Descomentar cuando el endpoint /docentes/materia/0 (o /docentes) esté listo
-    // cargarTutoresAcademicos();
-
+    // --- FUNCIÓN CARGAR TUTORES ACADÉMICOS ELIMINADA ---
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        
+
         const btn = document.getElementById("btn-registrar");
         btn.disabled = true;
         btn.textContent = "Registrando...";
-        
+
         clearStatus();
 
-        // 1. Recopilar datos del alumno
-        const tutorAcademicoId = selectTutorAcademico.value;
+        // --- RECOPILACIÓN DE DATOS DEL TUTOR LEGAL ---
+        const tutorLegal = {
+            nombre: document.getElementById("tutor_nombre").value,
+            apellidoPaterno: document.getElementById("tutor_apellidoPaterno").value,
+            apellidoMaterno: document.getElementById("tutor_apellidoMaterno").value,
+            telefono: document.getElementById("tutor_telefono").value,
+            fechaNacimiento: document.getElementById("tutor_fechaNacimiento").value || null
+        };
 
+        // 1. Recopilar datos del alumno (DTO)
         const alumno = {
             matricula: document.getElementById("matricula").value,
             curp: document.getElementById("curp").value.toUpperCase(),
@@ -80,12 +65,15 @@ document.addEventListener("DOMContentLoaded", () => {
             apellidoPaterno: document.getElementById("apellidoPaterno").value,
             apellidoMaterno: document.getElementById("apellidoMaterno").value,
             fechaNacimiento: document.getElementById("fechaNacimiento").value,
-            nombreTutor: document.getElementById("nombreTutor").value || null,
-            tutorAcademico: tutorAcademicoId ? { id: parseInt(tutorAcademicoId) } : null,
+
             numeroSeguroSocial: document.getElementById("nss").value || null,
             numeroPolizaSeguro: document.getElementById("poliza").value || null,
+
             condicionEspecial: document.getElementById("condicionEspecial").checked,
-            condicionEspecialDescripcion: document.getElementById("condicionDescripcion").value || null
+            condicionEspecialDescripcion: document.getElementById("condicionDescripcion").value || null,
+
+            tutorLegal: tutorLegal, // <-- Objeto TutorDTO anidado
+            // tutorAcademicoId ya no se envía
         };
 
         // --- RECOPILAR TODOS LOS ARCHIVOS ---
@@ -102,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            // 2. Registrar los datos del alumno
+            // 2. Registrar los datos del alumno (esto también creará al tutor)
             const alumnoResponse = await fetch("http://localhost:8080/alumnos", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -119,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
             showStatus(`Alumno ${matricula} registrado. Subiendo archivos...`, "success");
 
             // 3. Subir todos los documentos (4 archivos)
-            await uploadDocument(matricula, fotoFile, "IMAGEN_PERFIL");
+            await uploadDocument(matricula, fotoFile, "FOTO_ALUMNO"); // <--- TIPO CAMBIADO
             showStatus(`Foto de perfil subida...`, "success");
 
             await uploadDocument(matricula, actaFile, "ACTA_NACIMIENTO");

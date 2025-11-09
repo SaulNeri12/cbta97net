@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Entity
@@ -23,9 +24,13 @@ public class Tutor {
     @Column(name="apellido_materno", nullable = false, length = 50)
     private String apellidoMaterno;
 
-    @Column(name="fecha_nacimiento", nullable = false)
+    @Column(name="fecha_nacimiento") // Puede ser opcional
     private LocalDate fechaNacimiento;
 
     @Column(name="telefono", nullable = false, length = 20)
     private String telefono;
+
+    // Relación inversa: Un tutor puede tener varios alumnos
+    @OneToMany(mappedBy = "tutorLegal")
+    private Set<Alumno> alumnos;
 }

@@ -16,16 +16,15 @@ public abstract class AlumnoMapper {
     private DocenteRepository docenteRepository; // Para buscar el tutor académico por ID
 
     @Mappings({
-        @Mapping(source = "tutorAcademicoId", target = "tutorAcademico"),
-        // Ignoramos relaciones que no vienen en el DTO
-        @Mapping(target = "documentos", ignore = true),
-        @Mapping(target = "inscripciones", ignore = true)
+            @Mapping(source = "tutorAcademicoId", target = "tutorAcademico"),
+            // Ignoramos relaciones que no vienen en el DTO
+            @Mapping(target = "documentos", ignore = true),
+            @Mapping(target = "inscripciones", ignore = true)
     })
     public abstract Alumno toEntity(AlumnoDTO dto);
 
-    // Mapeo inverso (si se necesita para enviar datos al frontend)
     @Mappings({
-        @Mapping(source = "tutorAcademico.id", target = "tutorAcademicoId")
+            @Mapping(source = "tutorAcademico.id", target = "tutorAcademicoId")
     })
     public abstract AlumnoDTO toDTO(Alumno entity);
 
@@ -34,7 +33,6 @@ public abstract class AlumnoMapper {
         if (id == null) {
             return null;
         }
-        // Buscamos el docente. Si no existe, se devolverá null.
         return docenteRepository.findById(id).orElse(null);
     }
 }

@@ -1,6 +1,6 @@
 package mx.edu.cbta.sistemaescolar.alumnado.controller.exception;
 
-import mx.edu.cbta.sistemaescolar.alumnado.service.exception.AlumnoException;
+import mx.edu.cbta.sistemaescolar.alumnado.service.exceptions.AlumnoException;
 import mx.edu.cbta.sistemaescolar.alumnado.service.exception.DocumentoNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import java.io.IOException;
 import java.util.Map;
 
+// Esto interceptará errores SOLO del paquete 'alumnado.controller'
 @RestControllerAdvice(basePackages = "mx.edu.cbta.sistemaescolar.alumnado.controller")
 public class AlumnadoExceptionHandler {
 
@@ -28,7 +29,7 @@ public class AlumnadoExceptionHandler {
     public ResponseEntity<Map<String, String>> handleIOException(IOException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Error de E/S: " + ex.getMessage()));
     }
-    
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Argumento inválido: " + ex.getMessage()));
