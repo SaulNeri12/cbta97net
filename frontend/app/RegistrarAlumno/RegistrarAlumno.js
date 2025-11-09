@@ -5,6 +5,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const campoDescCondicion = document.getElementById("campo-descripcion-condicion");
     const selectTutorAcademico = document.getElementById("tutorAcademico");
 
+    // --- NUEVA LÓGICA PARA VISTA PREVIA DE FOTO ---
+    const fotoInput = document.getElementById("fotoAlumno");
+    const fotoPreview = document.getElementById("fotoPreview");
+    const placeholderImage = "placeholder-user.png"; // Ruta a tu imagen placeholder
+
+    fotoInput.addEventListener("change", () => {
+        const file = fotoInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                fotoPreview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            fotoPreview.src = placeholderImage; 
+        }
+    });
+    // --- FIN DE LÓGICA DE VISTA PREVIA ---
+
+    
     // Lógica para mostrar/ocultar descripción de condición
     checkCondicion.addEventListener("change", () => {
         if (checkCondicion.checked) {
@@ -19,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function cargarTutoresAcademicos() {
         try {
             // Asumimos que cualquier docente puede ser tutor
-            const response = await fetch("http://localhost:8080/docentes/materia/0"); // Se usa /materia/0 como truco para traer todos, idealmente sería un endpoint /docentes
+            const response = await fetch("http://localhost:8080/docentes/materia/0"); // Se usa /materia/0 como truco para traer todos
             if (!response.ok) throw new Error("No se pudieron cargar los docentes");
             
             const docentes = await response.json();
@@ -40,6 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Descomentar cuando el endpoint /docentes/materia/0 (o /docentes) esté listo
     // cargarTutoresAcademicos();
 
+
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         
@@ -59,8 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
             apellidoPaterno: document.getElementById("apellidoPaterno").value,
             apellidoMaterno: document.getElementById("apellidoMaterno").value,
             fechaNacimiento: document.getElementById("fechaNacimiento").value,
-            
-            // Nuevos campos
             nombreTutor: document.getElementById("nombreTutor").value || null,
             tutorAcademico: tutorAcademicoId ? { id: parseInt(tutorAcademicoId) } : null,
             numeroSeguroSocial: document.getElementById("nss").value || null,
@@ -69,12 +88,14 @@ document.addEventListener("DOMContentLoaded", () => {
             condicionEspecialDescripcion: document.getElementById("condicionDescripcion").value || null
         };
 
+        // --- RECOPILAR TODOS LOS ARCHIVOS ---
+        const fotoFile = document.getElementById("fotoAlumno").files[0];
         const actaFile = document.getElementById("actaNacimiento").files[0];
         const certFile = document.getElementById("certificadoSecundaria").files[0];
-        const curpFile = document.getElementById("documentoCurp").files[0]; // <-- Nuevo archivo
+        const curpFile = document.getElementById("documentoCurp").files[0];
 
-        if (!actaFile || !certFile || !curpFile) {
-            showStatus("Debe adjuntar los 3 documentos requeridos.", "error");
+        if (!fotoFile || !actaFile || !certFile || !curpFile) {
+            showStatus("Debe adjuntar la foto y los 3 documentos requeridos.", "error");
             btn.disabled = false;
             btn.textContent = "Registrar Alumno";
             return;
@@ -95,21 +116,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const alumnoCreado = await alumnoResponse.json();
             const matricula = alumnoCreado.matricula;
-            showStatus(`Alumno ${matricula} registrado. Subiendo documentos...`, "success");
+            showStatus(`Alumno ${matricula} registrado. Subiendo archivos...`, "success");
 
-            // 3. Subir documentos (ahora 3)
+            // 3. Subir todos los documentos (4 archivos)
+            await uploadDocument(matricula, fotoFile, "IMAGEN_PERFIL");
+            showStatus(`Foto de perfil subida...`, "success");
+
             await uploadDocument(matricula, actaFile, "ACTA_NACIMIENTO");
             showStatus(`Acta de nacimiento subida...`, "success");
 
             await uploadDocument(matricula, certFile, "CERTIFICADO_SECUNDARIA");
             showStatus(`Certificado de secundaria subido...`, "success");
 
-            await uploadDocument(matricula, curpFile, "CURP"); // <-- Nueva subida
+            await uploadDocument(matricula, curpFile, "CURP");
             showStatus(`Documento CURP subido. ¡Registro completo!`, "success");
 
             // 4. Limpiar formulario
             form.reset();
             campoDescCondicion.style.display = "none";
+            fotoPreview.src = placeholderImage;
             btn.disabled = false;
             btn.textContent = "Registrar Alumno";
 
@@ -124,12 +149,11 @@ document.addEventListener("DOMContentLoaded", () => {
     async function uploadDocument(matricula, file, tipo) {
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("tipo", tipo.toUpperCase()); // Asegura mayúsculas
+        formData.append("tipo", tipo.toUpperCase());
 
         const response = await fetch(`http://localhost:8080/alumnos/${matricula}/documentos`, {
             method: "POST",
             body: formData
-            // No se pone Content-Type, el navegador lo hace solo con FormData
         });
 
         if (!response.ok) {
@@ -154,5 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
         form.reset();
         clearStatus();
         campoDescCondicion.style.display = "none";
+        fotoPreview.src = placeholderImage;
     });
 });

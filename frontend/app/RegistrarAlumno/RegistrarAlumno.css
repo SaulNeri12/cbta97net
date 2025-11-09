@@ -3,9 +3,48 @@
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
+/* --- NUEVOS ESTILOS PARA FOTO DE PERFIL --- */
+.perfil-upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border: 2px dashed #ced4da;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.perfil-upload-container label {
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 0; /* Anula el label por defecto */
+}
+
+#fotoPreview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid #dee2e6;
+    object-fit: cover;
+    background-color: #fff;
+    margin-top: 0.5rem;
+}
+
+#fotoAlumno {
+    width: 100%;
+    max-width: 300px;
+    border: none;
+    background-color: transparent;
+    padding: 0;
+}
+/* --- FIN DE NUEVOS ESTILOS --- */
+
+
 .document-upload {
     display: grid;
-    /* grid-template-columns: 1fr 1fr; */ /* Cambiado para 3 columnas */
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
     margin-top: 1.5rem;
