@@ -1,4 +1,6 @@
-package mx.edu.cbta.sistemaescolar.academica.model;
+package mx.edu.cbta.sistemaescolar.alumnado.model;
+
+import mx.edu.cbta.sistemaescolar.academica.model.AlumnoInscrito;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -8,7 +10,7 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "alumnos")
+@Table(name="alumnos")
 public class Alumno {
 
     @Id
@@ -35,4 +37,6 @@ public class Alumno {
     // Un alumno puede estar inscrito en varios grupos a lo largo de su historia académica
     @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL)
     private Set<AlumnoInscrito> inscripciones;
+
+    // TODO: Agregar relacion con Docente para tutoria
 }
