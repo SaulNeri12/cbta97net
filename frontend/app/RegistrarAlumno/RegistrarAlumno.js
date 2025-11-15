@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- LÓGICA PARA VISTA PREVIA DE FOTO ---
     const fotoInput = document.getElementById("fotoAlumno");
     const fotoPreview = document.getElementById("fotoPreview");
-    const placeholderImage = "placeholder-user.png";
+    const placeholderImage = "../resources/placeholder-user.webp";
 
     fotoInput.addEventListener("change", () => {
         const file = fotoInput.files[0];

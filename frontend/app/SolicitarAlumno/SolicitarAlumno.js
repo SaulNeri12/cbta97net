@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // ---- Foto y Nombre ----
         const fotoDTO = data.documentos?.find(d => d.tipoDocumento === "FOTO_ALUMNO");
         // Usamos la URL base y la URL relativa del DTO
-        const fotoUrl = fotoDTO ? `${httpBase}${fotoDTO.urlDescarga}` : "../RegistrarAlumno/placeholder-user.png";
+        const fotoUrl = fotoDTO ? `${httpBase}${fotoDTO.urlDescarga}` : "../resources/placeholder-user.webp";
         
         document.getElementById("detalle-foto").src = fotoUrl;
         document.getElementById("detalle-nombre").textContent = `${data.nombre || ''} ${data.apellidoPaterno || ''} ${data.apellidoMaterno || ''}`;
