@@ -12,7 +12,7 @@ class RegistrarAlumnoPage {
         this.matriculaAlumnoField = By.id('matricula');
         this.nombreAlumnoField = By.id('matricula');
         this.curpAlumnoField = By.id('curp');
-        this.nombreAlumnofield = By.id('nombre');
+        this.nombreAlumnoField = By.id('nombre');
         this.apellidoPaternoAlumnoField = By.id('apellidoPaterno');
         this.apellidoMaternoAlumnoField = By.id('apellidoMaterno');
         this.fechaNacimientoAlumnoField = By.id('fechaNacimiento');
@@ -63,6 +63,30 @@ class RegistrarAlumnoPage {
 
     async asignarMatriculaAlumno(matricula) {
         await this.driver.findElement(this.matriculaAlumnoField).sendKeys(matricula);
+    }
+
+    async asignarCURPAlumno(curp) {
+        await this.driver.findElement(this.curpAlumnoField).sendKeys(curp);
+    }
+
+    async asignarNombreAlumno(nombre) {
+        await this.driver.findElement(this.nombreAlumnoField).sendKeys(nombre);
+    }
+
+    async asignarApellidoPaternoAlumno(apellidoPaterno) {
+        await this.driver.findElement(this.apellidoPaternoAlumnoField).sendKeys(apellidoPaterno);
+    }
+
+    async asignarApellidoMaternoAlumno(apellidoMaterno) {
+        await this.driver.findElement(this.apellidoMaternoAlumnoField).sendKeys(apellidoMaterno);
+    }
+
+    async asignarFechaNacimientoAlumno(fechaNacimiento) {
+        await this.driver.findElement(this.fechaNacimientoAlumnoField).sendKeys(fechaNacimiento);
+    }
+
+    async asignarNSSAlumno(nss) {
+        await this.driver.findElement(this.nssAlumnoField).sendKeys(nss);
     }
 
     /**
