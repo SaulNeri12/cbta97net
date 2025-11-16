@@ -1,11 +1,58 @@
 const driver = require('../../setup/driver');
 const { By, until } = require('selenium-webdriver');
 
+const path = require('path');
+
 const { RegistrarAlumnoPage } = require('../../pages/alumnos/registrar-alumno.page');
 
 require('dotenv').config();
 
 jest.setTimeout(60000)
+
+describe('CP #1 - Foto de Alumno con Formato Inválido', () => {
+    let registrarAlumnoPage;
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que la foto del alumno seleccionada detecta cuando una imagen no tiene el formato correcto (solo se acepta JPEG, PNG, WEBP).', async () => {
+        await registrarAlumnoPage.open();
+
+        const rutaRaiz = process.cwd();
+
+        const rutaAbsolutaArchivoInvalido = path.join(rutaRaiz, 'assets', 'archivo_invalido.txt');
+        const rutaAbsolutaArchivoValido = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
+
+        // archivo NO valido
+        await registrarAlumnoPage.asignarFotoAlumno(rutaAbsolutaArchivoInvalido);
+
+        let archivoCargado = await registrarAlumnoPage.driver
+            .findElement(registrarAlumnoPage.fotoAlumnoField)
+            .getAttribute("value");
+
+        expect(archivoCargado).not.toBeNull();
+        expect(normalizarTexto(archivoCargado)).toContain('');
+
+        await registrarAlumnoPage.driver.findElement(registrarAlumnoPage.fotoAlumnoField).clear();
+
+        // archivo valido
+        await registrarAlumnoPage.asignarFotoAlumno(rutaAbsolutaArchivoValido);
+
+        archivoCargado = await registrarAlumnoPage.driver
+            .findElement(registrarAlumnoPage.fotoAlumnoField)
+            .getAttribute("value");
+
+        expect(archivoCargado).not.toBeNull();
+        expect(normalizarTexto(archivoCargado)).toContain('jpeg');
+    });
+});
 
 describe('CP #2 - Matrícula con Formato Inválido', () => {
     let registrarAlumnoPage;
@@ -260,6 +307,43 @@ describe('CP #8 - Número de Seguro Social (NSS) del Alumno no válido', () => {
 
         // NSS valido (correcto)
         await registrarAlumnoPage.asignarNSSAlumno(nssValido);
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.nssAlumnoField);
+        expect(normalizarTexto(mensajeValidacion)).toContain('');
+
+
+        expect(mensajeValidacion).not.toBeNull();
+    });
+});
+
+
+
+describe('CP #9 - Póliza de Seguro del Alumno no válida', () => {
+    let registrarAlumnoPage;
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que el sistema detecta cuando la póliza de seguro del alumno tiene un formato incorrecto. El formato aceptado son solo números. (sin rango especificado).', async () => {
+
+        let polizaNoValida = "N555???";
+        const polizaValida = "2474982004";
+
+        await registrarAlumnoPage.open();
+
+        // Poliza No Valida
+        await registrarAlumnoPage.asignarPolizaSeguroAlumno(polizaNoValida);
+        let mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.polizaAlumnoField);
+        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+        expect(normalizarTexto(mensajeValidacion)).toContain('11');
+
+
+        // Poliza valida (correcta)
+        await registrarAlumnoPage.asignarPolizaSeguroAlumno(polizaNoValida);
         mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.nssAlumnoField);
         expect(normalizarTexto(mensajeValidacion)).toContain('');
 

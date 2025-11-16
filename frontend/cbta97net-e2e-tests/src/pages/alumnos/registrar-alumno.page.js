@@ -89,6 +89,15 @@ class RegistrarAlumnoPage {
         await this.driver.findElement(this.nssAlumnoField).sendKeys(nss);
     }
 
+    async asignarPolizaSeguroAlumno(poliza) {
+        await this.driver.findElement(this.polizaAlumnoField).sendKeys(poliza);
+    }
+
+    async asignarFotoAlumno(rutaArchivo) {
+        await this.driver.findElement(this.fotoAlumnoField).sendKeys(rutaArchivo);
+    }
+
+
     /**
      * Espera un tiempo determinado por una alerta "alert()" de JavaScript.
      * @param timeout
