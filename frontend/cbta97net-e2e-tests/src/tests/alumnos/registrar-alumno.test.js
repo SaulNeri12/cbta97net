@@ -483,7 +483,6 @@ describe('CP #13 - Fecha de Nacimiento del Tutor no válida (Debe tener 18 años
         expect(mensajeValidacion).not.toBeNull();
         expect(normalizarTexto(mensajeValidacion)).toContain('edad');
 
-        // =========================================================================
         await registrarAlumnoPage.asignarFechaNacimientoTutor(fechaValidaMayor);
         mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(
             registrarAlumnoPage.fechaNacimientoTutorField
@@ -717,5 +716,75 @@ describe('CP #19 - No permitir el registro sin completar todos los campos', () =
 
         expect(mensajeValidacion).not.toBeNull();
         expect(mensajeValidacion.length).toBeGreaterThan(0);
+    });
+});
+
+
+
+describe('CP #20 - Intento de registro de alumno sin asignar documentos', () => {
+    let registrarAlumnoPage;
+
+    const documentoFaltante = 'Acta de Nacimiento';
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test(`Verificar que el sistema exige los documentos al intentar registrar. (Probando el error en el campo: ${documentoFaltante})`, async () => {
+        await registrarAlumnoPage.open();
+
+        await registrarAlumnoPage.llenarCamposExceptoDocumentos(registrarAlumnoPage);
+
+        let mensajeValidacionPrevia = await registrarAlumnoPage.getNativeValidationError(
+            registrarAlumnoPage.matriculaAlumnoField
+        );
+        expect(mensajeValidacionPrevia).toBe("");
+
+        await registrarAlumnoPage.clickRegistrarAlumno();
+
+        let mensajeValidacionDocumento = await registrarAlumnoPage.getNativeValidationError(
+            registrarAlumnoPage.docActaNacimientoAlumnoField
+        );
+
+        expect(mensajeValidacionDocumento).not.toBeNull();
+        expect(mensajeValidacionDocumento.length).toBeGreaterThan(0);
+    });
+});
+
+
+
+describe('CP #21 - Problema de conexión al intentar Registrar Alumno', () => {
+    let registrarAlumnoPage;
+    const rutaRaiz = process.cwd();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que un fallo de conexión al intentar registrar genera un mensaje de error.', async () => {
+        await registrarAlumnoPage.open();
+
+        await registrarAlumnoPage.llenarCamposDatosValidos(registrarAlumnoPage, rutaRaiz);
+
+        let mensajeValidacionPrevia = await registrarAlumnoPage.getNativeValidationError(
+            registrarAlumnoPage.matriculaAlumnoField
+        );
+        expect(mensajeValidacionPrevia).toBe("");
+
+        await registrarAlumnoPage.setupConnectionRefusedMock();
+
+        await registrarAlumnoPage.clickRegistrarAlumno();
+
+        const mensajeErrorConexion = await registrarAlumnoPage.getOnScreenConnectionErrorMessage();
+
+        expect(mensajeErrorConexion).not.toBeNull();
+        expect(mensajeErrorConexion.length).toBeGreaterThan(0);
+
+        const normalizado = mensajeErrorConexion
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+
+        expect(normalizado).toMatch(/(servidor|red|conexion|fallo|error)/);
     });
 });

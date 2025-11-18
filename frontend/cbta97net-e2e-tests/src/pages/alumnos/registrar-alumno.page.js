@@ -1,5 +1,6 @@
 const { By, until } = require('selenium-webdriver');
 const { BASE_URL } = require('../../utils/config');
+const path = require('path');
 
 class RegistrarAlumnoPage {
 
@@ -34,6 +35,7 @@ class RegistrarAlumnoPage {
         this.fechaNacimientoTutorField = By.id('tutor_fechaNacimiento');
 
         this.registrarAlumnoBtn = By.id('btn-registrar');
+        this.connectionErrorAlert = By.id('status-message');
     }
 
     async open() {
@@ -113,6 +115,10 @@ class RegistrarAlumnoPage {
         await this.driver.findElement(this.telefonoTutorField).sendKeys(telefono);
     }
 
+    async asignarFechaNacimientoTutor(fechaNacimiento) {
+        await this.driver.findElement(this.fechaNacimientoTutorField).sendKeys(fechaNacimiento);
+    }
+
     async introducirDocumentoActaNacimientoAlumno(rutaActaNacimiento) {
         await this.driver.findElement(this.docActaNacimientoAlumnoField).sendKeys(rutaActaNacimiento);
     }
@@ -153,6 +159,31 @@ class RegistrarAlumnoPage {
         await this.driver.findElement(this.registrarAlumnoBtn).click();
     }
 
+
+    async getOnScreenConnectionErrorMessage() {
+        try {
+            // Esperamos a que el elemento se encuentre en el DOM (máx. 5 segundos)
+            const errorElement = await this.driver.wait(
+                until.elementLocated(this.connectionErrorAlert),
+                5000
+            );
+
+            // 1. Verificamos que esté visible
+            if (await errorElement.isDisplayed()) {
+                // 2. Si está visible, retornamos el texto
+                return await errorElement.getText();
+            }
+
+            // 3. Si se encuentra pero NO está visible, retornamos null
+            return null;
+
+        } catch (error) {
+            // Si hay un TimeoutError (el elemento nunca apareció) o cualquier otro error,
+            // retornamos null. ESTO EVITA EL ERROR DE 'undefined.length'.
+            return null;
+        }
+    }
+
     /**
      * Espera un tiempo determinado por una alerta "alert()" de JavaScript.
      * @param timeout
@@ -181,6 +212,55 @@ class RegistrarAlumnoPage {
         }
     }
 
+    async llenarCamposExceptoDocumentos(registrarAlumnoPage) {
+
+        // Datos Válidos para Alumno (pasando CP #2 a #14)
+        await registrarAlumnoPage.asignarMatriculaAlumno("19040042");
+        await registrarAlumnoPage.asignarCURPAlumno("EOLE049815HERRELA1");
+        await registrarAlumnoPage.asignarNombreAlumno("Carlos");
+        await registrarAlumnoPage.asignarApellidoPaternoAlumno("Perez");
+        await registrarAlumnoPage.asignarApellidoMaternoAlumno("Moreno");
+        // Asumiendo que 2000-01-01 es una fecha válida para alumno (mayor de edad mínima)
+        await registrarAlumnoPage.asignarFechaNacimientoAlumno("2000-01-01");
+        await registrarAlumnoPage.asignarNSSAlumno("01234567899");
+        await registrarAlumnoPage.asignarPolizaSeguroAlumno("2474982004");
+        // No toggle Condicion Especial para mantener el formulario simple (y el campo de descripcion oculto)
+
+        // Datos Válidos para Tutor (pasando CP #10 a #14)
+        await registrarAlumnoPage.asignarNombreTutor("David");
+        await registrarAlumnoPage.asignarApellidoPaternoTutor("Sanchez");
+        await registrarAlumnoPage.asignarApellidoMaternoTutor("Lopez");
+        await registrarAlumnoPage.asignarNumeroTelefonoTutor("6444000000");
+        // Asumiendo que 1970-01-01 es una fecha válida para tutor (mayor de 18 años)
+        await registrarAlumnoPage.asignarFechaNacimientoTutor("1970-01-01");
+
+    }
+
+    async llenarCamposDatosValidos(registrarAlumnoPage, rutaRaiz) {
+        const rutaAbsolutaArchivoValidoPdf = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
+        const rutaAbsolutaArchivoValidoJpeg = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
+
+        await registrarAlumnoPage.asignarFotoAlumno(rutaAbsolutaArchivoValidoJpeg);
+        await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCURPAlumno(rutaAbsolutaArchivoValidoPdf);
+
+        await registrarAlumnoPage.asignarMatriculaAlumno("19040042");
+        await registrarAlumnoPage.asignarCURPAlumno("EOLE049815HERRELA1");
+        await registrarAlumnoPage.asignarNombreAlumno("Carlos");
+        await registrarAlumnoPage.asignarApellidoPaternoAlumno("Perez");
+        await registrarAlumnoPage.asignarApellidoMaternoAlumno("Moreno");
+        await registrarAlumnoPage.asignarFechaNacimientoAlumno("2000-01-01");
+        await registrarAlumnoPage.asignarNSSAlumno("01234567899");
+        await registrarAlumnoPage.asignarPolizaSeguroAlumno("2474982004");
+
+        await registrarAlumnoPage.asignarNombreTutor("David");
+        await registrarAlumnoPage.asignarApellidoPaternoTutor("Sanchez");
+        await registrarAlumnoPage.asignarApellidoMaternoTutor("Lopez");
+        await registrarAlumnoPage.asignarNumeroTelefonoTutor("6444000000");
+        await registrarAlumnoPage.asignarFechaNacimientoTutor("1970-01-01");
+    }
+
     /**
      * Obtiene el mensaje de validación HTML5 de un campo.
      * Esto funciona para inputs con required, type="email", etc.
@@ -202,37 +282,37 @@ class RegistrarAlumnoPage {
      */
     async setupConnectionRefusedMock() {
         await this.driver.executeScript(`
-      if (window.XMLHttpRequest) {
-          // Guardamos la función original (no crítico para este caso, pero buena práctica)
-          const originalXHRSend = XMLHttpRequest.prototype.send;
-          
-          XMLHttpRequest.prototype.send = function() {
-              // 1. Opcional: Ejecuta el handler de error si existe
-              if (this.onerror) {
-                  const fakeErrorEvent = new Event('error');
-                  this.onerror(fakeErrorEvent);
-              }
+        if (window.XMLHttpRequest) {
+            const originalXHRSend = XMLHttpRequest.prototype.send;
+            XMLHttpRequest.prototype.send = function() {
+                // Simular un estado de conexión fallida: status 0
+                if (this.onerror) {
+                    const fakeErrorEvent = new Event('error');
+                    this.onerror(fakeErrorEvent);
+                }
+                Object.defineProperty(this, 'readyState', { value: 4 });
+                Object.defineProperty(this, 'status', { value: 0 });
+                if (this.onloadend) {
+                    this.onloadend(); 
+                }
+                console.log('Interceptado XHR. Forzando fallo de conexión.');
+                // No llamar a originalXHRSend.apply para evitar la petición real.
+            };
+        }
 
-              // 2. Simular un estado de conexión fallida para el frontend.
-              // El error de red puro a menudo ocurre antes de que la petición se envíe realmente.
-              // Ponemos el readyState en 4 (DONE) y status 0 para simular "No se pudo conectar".
-              Object.defineProperty(this, 'readyState', { value: 4 });
-              Object.defineProperty(this, 'status', { value: 0 });
-
-              // 3. Simular que la petición terminó con error (llamando a onLoadEnd o onError)
-              if (this.onloadend) {
-                  this.onloadend(); 
-              }
-              
-              console.log('Interceptado XHR. Forzando fallo de conexión.');
-              // No llamamos a originalXHRSend.apply(this, arguments);
-              // para evitar que la petición real salga.
-          };
-          
-          console.log('Función XMLHttpRequest.send SOBRESCRITA para fallar.');
-      } else {
-          console.warn('XMLHttpRequest no disponible globalmente, el mock falló.');
-      }
+        if (window.fetch) {
+            const originalFetch = window.fetch;
+            window.fetch = function() {
+                console.log('Interceptado fetch(). Forzando fallo de conexión (Network Error).');
+                // Devolvemos una Promise que rechaza para simular un fallo de red real (e.g., TypeError)
+                return new Promise((resolve, reject) => {
+                    // El TypeError es lo que la aplicación espera en un fallo de red puro.
+                    reject(new TypeError('Failed to fetch. No se pudo conectar a la red.')); 
+                });
+            };
+        }
+        
+        console.log('Mocking de XMLHttpRequest.send y fetch() ejecutado.');
     `);
     }
 }
