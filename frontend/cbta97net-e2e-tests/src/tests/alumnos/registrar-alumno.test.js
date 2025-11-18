@@ -788,3 +788,58 @@ describe('CP #21 - Problema de conexión al intentar Registrar Alumno', () => {
         expect(normalizado).toMatch(/(servidor|red|conexion|fallo|error)/);
     });
 });
+
+
+describe('CP #30 - Registro de Alumno exitoso', () => {
+    let registrarAlumnoPage;
+    const rutaRaiz = process.cwd();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que el sistema registra correctamente al alumno cuando todos sus datos cumplen con el formato correcto al igual que sus documentos.', async () => {
+        await registrarAlumnoPage.open();
+
+        await registrarAlumnoPage.llenarCamposDatosValidos(registrarAlumnoPage, rutaRaiz);
+
+        await registrarAlumnoPage.clickRegistrarAlumno();
+
+        const FINAL_SUCCESS_PHRASE_NORMALIZED = "registro completo";
+
+        const statusElement = await registrarAlumnoPage.driver.wait(
+            until.elementLocated(registrarAlumnoPage.connectionErrorAlert),
+            20000,
+            'Timeout: El elemento de mensaje de estado no apareció en el DOM.'
+        );
+
+        await registrarAlumnoPage.driver.wait(async () => {
+            try {
+                const currentText = await statusElement.getText();
+
+                const normalizado = currentText
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .toLowerCase();
+
+                return normalizado.includes(FINAL_SUCCESS_PHRASE_NORMALIZED);
+            } catch (error) {
+                // Si el elemento se vuelve Stale (se reemplaza), volvemos a intentar
+                return false;
+            }
+        }, 20000, 'Timeout: El mensaje final de éxito no apareció en el elemento de estado en el tiempo límite.');
+
+
+        const mensajeExito = await statusElement.getText();
+
+        expect(mensajeExito).not.toBeNull();
+        expect(mensajeExito.length).toBeGreaterThan(0);
+
+        const normalizado = mensajeExito
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+
+        expect(normalizado).toMatch(/(registro).*?(completo)/);
+    });
+});
