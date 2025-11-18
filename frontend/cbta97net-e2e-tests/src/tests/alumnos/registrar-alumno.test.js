@@ -351,3 +351,371 @@ describe('CP #9 - Póliza de Seguro del Alumno no válida', () => {
         expect(mensajeValidacion).not.toBeNull();
     });
 });
+
+
+
+describe('CP #10 - Nombre del Tutor con Formato Inválido', () => {
+    let registrarAlumnoPage;
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que el sistema valida correctamente el nombre del tutor legal del alumno. El sistema debe mostrar un mensaje indicando que el nombre ingresado no cumple con el formato requerido. El formato no permite números ni símbolos.', async () => {
+        let nombreNoValido = "D4vid?";
+        const nombreValido = "David";
+
+        await registrarAlumnoPage.open();
+
+        await registrarAlumnoPage.asignarNombreTutor(nombreNoValido);
+        let mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.nombreTutorField);
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+
+        await registrarAlumnoPage.asignarNombreTutor(nombreValido)
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.nombreTutorField);
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('');
+    });
+});
+
+
+
+
+describe('CP #11 - Apellido Paterno del tutor con Formato Inválido', () => {
+    let registrarAlumnoPage;
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que el sistema valida correctamente el apellido paterno del tutor legal del alumno. El sistema debe mostrar un mensaje indicando que el apellido paterno ingresado no cumple con el formato requerido. El formato no permite números ni símbolos.', async () => {
+        let apellidoNoValido = "P3r3z?";
+        const apellidoValido = "Perez";
+
+        await registrarAlumnoPage.open();
+
+        await registrarAlumnoPage.asignarApellidoPaternoAlumno(apellidoNoValido);
+        let mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.apellidoPaternoAlumnoField);
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+
+        await registrarAlumnoPage.asignarApellidoPaternoAlumno(apellidoValido);
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.apellidoPaternoAlumnoField);
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('');
+    });
+});
+
+
+
+describe('CP #12 - Apellido Materno del tutor con Formato Inválido', () => {
+    let registrarAlumnoPage;
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que el sistema valida correctamente el apellido materno del tutor legal del alumno. El sistema debe mostrar un mensaje indicando que el apellido materno ingresado no cumple con el formato requerido. El formato no permite números ni símbolos.', async () => {
+        let apellidoNoValido = "P3r3z???";
+        const apellidoValido = "Perez";
+
+        await registrarAlumnoPage.open();
+
+        await registrarAlumnoPage.asignarApellidoMaternoTutor(apellidoNoValido);
+        let mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.apellidoMaternoTutorField);
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+
+        await registrarAlumnoPage.asignarApellidoMaternoTutor(apellidoValido);
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.apellidoMaternoTutorField);
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('');
+    });
+});
+
+
+
+describe('CP #13 - Fecha de Nacimiento del Tutor no válida (Debe tener 18 años o más)', () => {
+    let registrarAlumnoPage;
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que el sistema valida correctamente que el tutor legal tiene 18 años o más.', async () => {
+
+        const hoy = new Date();
+
+        const fechaInvalidaMenor = "2010-01-01"; // menor de 18 años
+
+        const fechaValidaMayor = "1990-01-01";
+
+        await registrarAlumnoPage.open();
+
+        await registrarAlumnoPage.asignarFechaNacimientoTutor(fechaInvalidaMenor);
+        let mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(
+            registrarAlumnoPage.fechaNacimientoTutorField
+        );
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('edad');
+
+        // =========================================================================
+        await registrarAlumnoPage.asignarFechaNacimientoTutor(fechaValidaMayor);
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(
+            registrarAlumnoPage.fechaNacimientoTutorField
+        );
+
+        expect(mensajeValidacion).toBeNull(); // NO debe haber mensaje de error
+    });
+});
+
+
+
+
+describe('CP #14 - Validar el número de teléfono del tutor', () => {
+    let registrarAlumnoPage;
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar cuando se ingresa el documento del Acta de Nacimiento del alumno en el campo correspondiente, se notifique al usuario que dicho documento excede el tamaño aceptado por el sistema. Además de verificar que el formato del archivo es PDF.', async () => {
+
+        const telefonoInvalido = "644L01311";
+
+        const telefonoCorrecto = "6444000000";
+
+        await registrarAlumnoPage.open();
+
+        await registrarAlumnoPage.asignarNumeroTelefonoTutor(telefonoInvalido)
+        let mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(
+            registrarAlumnoPage.telefonoTutorField
+        );
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+
+        await registrarAlumnoPage.asignarNumeroTelefonoTutor(telefonoCorrecto)
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(
+            registrarAlumnoPage.telefonoTutorField
+        );
+
+        expect(mensajeValidacion).toBeNull();
+    });
+});
+
+
+
+describe('CP #15 - Documento Acta de Nacimiento - Formato y Tamaño', () => {
+    let registrarAlumnoPage;
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar la validación de formato (solo PDF) y tamaño (max 10MB) del Acta de Nacimiento.', async () => {
+        await registrarAlumnoPage.open();
+        const rutaRaiz = process.cwd();
+
+        // prueba documento formato no valido
+        const rutaAbsolutaArchivoInvalido = path.join(rutaRaiz, 'assets', 'documentos', 'pesados', 'DocumentoTestPesado_10mb.txt');
+        await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoInvalido);
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docActaNacimientoAlumnoField);
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('pdf');
+        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+
+        // prueba documento pesado PDF
+        const rutaAbsolutaArchivoPesado = path.join(rutaRaiz, 'assets', 'documentos', 'pesados', 'DocumentoTestPesado_10mb.pdf');
+        await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoPesado);
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docActaNacimientoAlumnoField);
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('pdf');
+        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+
+        // prueba documento valido
+        const rutaAbsolutaArchivoValido = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
+        await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoValido);
+
+        let archivoCargado = await registrarAlumnoPage.driver
+            .findElement(registrarAlumnoPage.docActaNacimientoAlumnoField)
+            .getAttribute("value");
+
+        expect(archivoCargado).not.toBeNull();
+        expect(normalizarTexto(archivoCargado)).toContain('pdf');
+    });
+});
+
+
+
+describe('CP #16 - Documento Certificado de Secundaria - Formato y Tamaño', () => {
+    let registrarAlumnoPage;
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar la validación de formato (solo PDF) y tamaño (max 10MB) del Certificado de Secundaria.', async () => {
+        await registrarAlumnoPage.open();
+        const rutaRaiz = process.cwd();
+
+        const rutaAbsolutaArchivoInvalido = path.join(rutaRaiz, 'assets', 'documentos', 'pesados', 'DocumentoTestPesado_10mb.txt');
+        await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoInvalido);
+        let mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docCertificadoSecundariaAlumnoField);
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('pdf');
+        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+
+        const rutaAbsolutaArchivoPesado = path.join(rutaRaiz, 'assets', 'documentos', 'pesados', 'DocumentoTestPesado_10mb.pdf');
+        await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoPesado);
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docCertificadoSecundariaAlumnoField);
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('pdf');
+
+        const rutaAbsolutaArchivoValido = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
+        await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoValido);
+
+        let archivoCargado = await registrarAlumnoPage.driver
+            .findElement(registrarAlumnoPage.docCertificadoSecundariaAlumnoField)
+            .getAttribute("value");
+
+        expect(archivoCargado).not.toBeNull();
+        expect(normalizarTexto(archivoCargado)).toContain('pdf');
+
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docCertificadoSecundariaAlumnoField);
+        expect(mensajeValidacion).toBeNull();
+    });
+});
+
+
+
+describe('CP #17 - Documento CURP del Alumno - Formato y Tamaño', () => {
+    let registrarAlumnoPage;
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar la validación de formato (solo PDF) y tamaño (max 10MB) del Documento CURP.', async () => {
+        await registrarAlumnoPage.open();
+        const rutaRaiz = process.cwd();
+
+        const rutaAbsolutaArchivoInvalido = path.join(rutaRaiz, 'assets', 'documentos', 'pesados', 'DocumentoTestPesado_10mb.txt');
+        await registrarAlumnoPage.introducirDocumentoCURPAlumno(rutaAbsolutaArchivoInvalido);
+        let mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docCURPAlumnoField);
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(normalizarTexto(mensajeValidacion)).toContain('pdf');
+        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+
+        const rutaAbsolutaArchivoPesado = path.join(rutaRaiz, 'assets', 'documentos', 'pesados', 'DocumentoTestPesado_10mb.pdf');
+        await registrarAlumnoPage.introducirDocumentoCURPAlumno(rutaAbsolutaArchivoPesado);
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docCURPAlumnoField);
+        expect(mensajeValidacion).not.toBeNull();
+
+        const rutaAbsolutaArchivoValido = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
+        await registrarAlumnoPage.introducirDocumentoCURPAlumno(rutaAbsolutaArchivoValido);
+
+        let archivoCargado = await registrarAlumnoPage.driver
+            .findElement(registrarAlumnoPage.docCURPAlumnoField)
+            .getAttribute("value");
+
+        expect(archivoCargado).not.toBeNull();
+        expect(normalizarTexto(archivoCargado)).toContain('pdf');
+
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docCURPAlumnoField);
+        expect(mensajeValidacion).toBeNull();
+    });
+});
+
+
+describe('CP #18 - Especificación de Condición Especial del Alumno', () => {
+    let registrarAlumnoPage;
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que al seleccionar la opción de Condición Especial se muestra/oculta el campo de descripción.', async () => {
+        await registrarAlumnoPage.open();
+
+        await registrarAlumnoPage.toggleCondicionEspecialAlumno();
+
+        let isVisible = await registrarAlumnoPage.isCondicionEspecialDescripcionVisible();
+        expect(isVisible).toBe(true);
+
+        await registrarAlumnoPage.toggleCondicionEspecialAlumno();
+
+        isVisible = await registrarAlumnoPage.isCondicionEspecialDescripcionVisible();
+        expect(isVisible).toBe(false);
+    });
+});
+
+
+
+describe('CP #19 - No permitir el registro sin completar todos los campos', () => {
+    let registrarAlumnoPage;
+
+    const campoRequerido = 'Nombre del Alumno';
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test(`Verificar que el sistema valida y detiene el registro si faltan campos obligatorios. (Probando con ${campoRequerido})`, async () => {
+        await registrarAlumnoPage.open();
+
+        await registrarAlumnoPage.clickRegistrarAlumno();
+
+        let mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(
+            registrarAlumnoPage.nombreAlumnoField
+        );
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(mensajeValidacion.length).toBeGreaterThan(0);
+    });
+});

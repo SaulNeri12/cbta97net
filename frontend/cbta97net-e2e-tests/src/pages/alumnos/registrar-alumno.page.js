@@ -33,7 +33,7 @@ class RegistrarAlumnoPage {
         this.telefonoTutorField = By.id('tutor_telefono');
         this.fechaNacimientoTutorField = By.id('tutor_fechaNacimiento');
 
-        this.registrarAlumnoBtn = By.css('button[type="submit"]');
+        this.registrarAlumnoBtn = By.id('btn-registrar');
     }
 
     async open() {
@@ -97,6 +97,61 @@ class RegistrarAlumnoPage {
         await this.driver.findElement(this.fotoAlumnoField).sendKeys(rutaArchivo);
     }
 
+    async asignarNombreTutor(nombre) {
+        await this.driver.findElement(this.nombreTutorField).sendKeys(nombre);
+    }
+
+    async asignarApellidoPaternoTutor(apellidoPaterno) {
+        await this.driver.findElement(this.apellidoPaternoTutorField).sendKeys(apellidoPaterno);
+    }
+
+    async asignarApellidoMaternoTutor(apellidoMaterno) {
+        await this.driver.findElement(this.apellidoMaternoTutorField).sendKeys(apellidoMaterno);
+    }
+
+    async asignarNumeroTelefonoTutor(telefono) {
+        await this.driver.findElement(this.telefonoTutorField).sendKeys(telefono);
+    }
+
+    async introducirDocumentoActaNacimientoAlumno(rutaActaNacimiento) {
+        await this.driver.findElement(this.docActaNacimientoAlumnoField).sendKeys(rutaActaNacimiento);
+    }
+
+    async introducirDocumentoCertificadoSecundariaAlumno(rutaCertificado) {
+        await this.driver.findElement(this.docCertificadoSecundariaAlumnoField).sendKeys(rutaCertificado);
+    }
+
+    async introducirDocumentoCURPAlumno(rutaCURP) {
+        await this.driver.findElement(this.docCURPAlumnoField).sendKeys(rutaCURP);
+    }
+
+    async toggleCondicionEspecialAlumno() {
+        // Localiza el checkbox por su ID y haz clic en él
+        await this.driver.findElement(this.condicionEspecialAlumnoCheckbox).click();
+    }
+
+    async isCondicionEspecialDescripcionVisible() {
+        // Busca el elemento de descripción de la condición especial
+        const elements = await this.driver.findElements(this.condicionEspecialDescripcionAlumnoField);
+
+        // Si no se encuentra en el DOM (length === 0), está oculto.
+        if (elements.length === 0) {
+            return false;
+        }
+
+        // Si se encuentra, verifica su visibilidad.
+        try {
+            const isVisible = await elements[0].isDisplayed();
+            return isVisible;
+        } catch (e) {
+            // En caso de error de visibilidad o de elemento no adjunto, asumimos que no está visible
+            return false;
+        }
+    }
+
+    async clickRegistrarAlumno() {
+        await this.driver.findElement(this.registrarAlumnoBtn).click();
+    }
 
     /**
      * Espera un tiempo determinado por una alerta "alert()" de JavaScript.
