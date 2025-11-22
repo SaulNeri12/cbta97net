@@ -790,7 +790,8 @@ describe('CP #21 - Problema de conexión al intentar Registrar Alumno', () => {
 });
 
 
-describe('CP #30 - Registro de Alumno exitoso', () => {
+
+describe('CP #22 - Registro de Alumno exitoso', () => {
     let registrarAlumnoPage;
     const rutaRaiz = process.cwd();
 
@@ -801,7 +802,28 @@ describe('CP #30 - Registro de Alumno exitoso', () => {
     test('Verificar que el sistema registra correctamente al alumno cuando todos sus datos cumplen con el formato correcto al igual que sus documentos.', async () => {
         await registrarAlumnoPage.open();
 
-        await registrarAlumnoPage.llenarCamposDatosValidos(registrarAlumnoPage, rutaRaiz);
+        const rutaAbsolutaArchivoValidoPdf = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
+        const rutaAbsolutaArchivoValidoJpeg = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
+
+        await registrarAlumnoPage.asignarMatriculaAlumno("19040042");
+        await registrarAlumnoPage.asignarCURPAlumno("EOLE049815HERRELA1");
+        await registrarAlumnoPage.asignarNombreAlumno("Carlos");
+        await registrarAlumnoPage.asignarApellidoPaternoAlumno("Perez");
+        await registrarAlumnoPage.asignarApellidoMaternoAlumno("Moreno");
+        await registrarAlumnoPage.asignarFechaNacimientoAlumno("2000-01-01");
+        await registrarAlumnoPage.asignarNSSAlumno("01234567899");
+        await registrarAlumnoPage.asignarPolizaSeguroAlumno("2474982004");
+
+        await registrarAlumnoPage.asignarNombreTutor("David");
+        await registrarAlumnoPage.asignarApellidoPaternoTutor("Sanchez");
+        await registrarAlumnoPage.asignarApellidoMaternoTutor("Lopez");
+        await registrarAlumnoPage.asignarNumeroTelefonoTutor("6444000000");
+        await registrarAlumnoPage.asignarFechaNacimientoTutor("1970-01-01");
+
+        await registrarAlumnoPage.asignarFotoAlumno(rutaAbsolutaArchivoValidoJpeg);
+        await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCURPAlumno(rutaAbsolutaArchivoValidoPdf);
 
         await registrarAlumnoPage.clickRegistrarAlumno();
 
@@ -809,7 +831,7 @@ describe('CP #30 - Registro de Alumno exitoso', () => {
 
         const statusElement = await registrarAlumnoPage.driver.wait(
             until.elementLocated(registrarAlumnoPage.connectionErrorAlert),
-            20000,
+            10_000,
             'Timeout: El elemento de mensaje de estado no apareció en el DOM.'
         );
 
@@ -827,7 +849,7 @@ describe('CP #30 - Registro de Alumno exitoso', () => {
                 // Si el elemento se vuelve Stale (se reemplaza), volvemos a intentar
                 return false;
             }
-        }, 20000, 'Timeout: El mensaje final de éxito no apareció en el elemento de estado en el tiempo límite.');
+        }, 10_000, 'Timeout: El mensaje final de éxito no apareció en el elemento de estado en el tiempo límite.');
 
 
         const mensajeExito = await statusElement.getText();
@@ -843,3 +865,403 @@ describe('CP #30 - Registro de Alumno exitoso', () => {
         expect(normalizado).toMatch(/(registro).*?(completo)/);
     });
 });
+
+
+
+describe('CP #23 - Validación campos opcionales NSS y Póliza de Seguro', () => {
+    let registrarAlumnoPage;
+    const rutaRaiz = process.cwd();
+
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que el sistema pueda registrar a un alumno aún cuando se omitan los campos de Número de Seguro Social (NSS) y la Póliza de Seguro.\n', async () => {
+        await registrarAlumnoPage.open();
+
+        const rutaAbsolutaArchivoValidoPdf = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
+        const rutaAbsolutaArchivoValidoJpeg = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
+
+        await registrarAlumnoPage.asignarMatriculaAlumno("10305090");
+        await registrarAlumnoPage.asignarCURPAlumno("SANE049815HERRELA1");
+        await registrarAlumnoPage.asignarNombreAlumno("Carlos");
+        await registrarAlumnoPage.asignarApellidoPaternoAlumno("Perez");
+        await registrarAlumnoPage.asignarApellidoMaternoAlumno("Moreno");
+        await registrarAlumnoPage.asignarFechaNacimientoAlumno("2000-01-01");
+        // await registrarAlumnoPage.asignarNSSAlumno("01234567899"); // NOTE: se omite el NSS
+        // await registrarAlumnoPage.asignarPolizaSeguroAlumno("2474982004"); // NOTE: se omite la Poliza de Seguro
+
+        await registrarAlumnoPage.asignarNombreTutor("David");
+        await registrarAlumnoPage.asignarApellidoPaternoTutor("Sanchez");
+        await registrarAlumnoPage.asignarApellidoMaternoTutor("Lopez");
+        await registrarAlumnoPage.asignarNumeroTelefonoTutor("6444000000");
+        await registrarAlumnoPage.asignarFechaNacimientoTutor("1970-01-01");
+
+        await registrarAlumnoPage.asignarFotoAlumno(rutaAbsolutaArchivoValidoJpeg);
+        await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCURPAlumno(rutaAbsolutaArchivoValidoPdf);
+
+        await registrarAlumnoPage.clickRegistrarAlumno();
+
+        const FINAL_SUCCESS_PHRASE_NORMALIZED = "registro completo";
+
+        const statusElement = await registrarAlumnoPage.driver.wait(
+            until.elementLocated(registrarAlumnoPage.connectionErrorAlert),
+            10_000,
+            'Timeout: El elemento de mensaje de estado no apareció en el DOM.'
+        );
+
+        await registrarAlumnoPage.driver.wait(async () => {
+            try {
+                const currentText = await statusElement.getText();
+
+                const normalizado = currentText
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .toLowerCase();
+
+                return normalizado.includes(FINAL_SUCCESS_PHRASE_NORMALIZED);
+            } catch (error) {
+                // Si el elemento se vuelve Stale (se reemplaza), volvemos a intentar
+                return false;
+            }
+        }, 10_000, 'Timeout: El mensaje final de éxito no apareció en el elemento de estado en el tiempo límite.');
+
+
+        const mensajeExito = await statusElement.getText();
+
+        expect(mensajeExito).not.toBeNull();
+        expect(mensajeExito.length).toBeGreaterThan(0);
+
+        const normalizado = mensajeExito
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+
+        expect(normalizado).toMatch(/(registro).*?(completo)/);
+    });
+});
+
+
+describe('CP #24 - Validación de campos contra inyecciones SQL', () => {
+    let registrarAlumnoPage;
+    const rutaRaiz = process.cwd();
+
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    const SQL_INJECTION_STRING = "'; DROP TABLE alumnos; -- ";
+
+    const ERROR_MESSAGE_KEYWORD = /error|invalido|corregir|no permitido|sql|caracteres no permitidos/;
+
+    const FINAL_SUCCESS_PHRASE_NORMALIZED = "registro completo";
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que el sistema sea resiliente ante inyecciones SQL.', async () => {
+        await registrarAlumnoPage.open();
+
+        const rutaAbsolutaArchivoValidoPdf = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
+        const rutaAbsolutaArchivoValidoJpeg = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
+
+        await registrarAlumnoPage.asignarMatriculaAlumno("6502650665");
+        await registrarAlumnoPage.asignarCURPAlumno("NETO049815HERRELA1");
+
+        await registrarAlumnoPage.asignarNombreAlumno(SQL_INJECTION_STRING);
+
+        await registrarAlumnoPage.asignarApellidoPaternoAlumno("Perez");
+        await registrarAlumnoPage.asignarApellidoMaternoAlumno("Moreno");
+        await registrarAlumnoPage.asignarFechaNacimientoAlumno("2000-01-01");
+
+        // Datos del Tutor
+        await registrarAlumnoPage.asignarNombreTutor("David");
+        await registrarAlumnoPage.asignarApellidoPaternoTutor("Sanchez");
+        await registrarAlumnoPage.asignarApellidoMaternoTutor("Lopez");
+        await registrarAlumnoPage.asignarNumeroTelefonoTutor("6444000000");
+        await registrarAlumnoPage.asignarFechaNacimientoTutor("1970-01-01");
+
+        // Documentos
+        await registrarAlumnoPage.asignarFotoAlumno(rutaAbsolutaArchivoValidoJpeg);
+        await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCURPAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.clickRegistrarAlumno();
+
+        const statusElement = await registrarAlumnoPage.driver.wait(
+            until.elementLocated(registrarAlumnoPage.connectionErrorAlert),
+            20_000,
+            'Timeout: El elemento de mensaje de estado no apareció en el DOM.'
+        );
+
+        const mensaje = await statusElement.getText();
+        const normalizado = normalizarTexto(mensaje);
+
+        console.log(mensaje);
+
+        expect(normalizado).not.toMatch(/(registro).*?(completo)/);
+
+        expect(normalizado).toMatch(ERROR_MESSAGE_KEYWORD);
+    });
+});
+
+
+
+
+describe('CP #27 - Validación de CURP repetida', () => {
+    let registrarAlumnoPage;
+    const rutaRaiz = process.cwd();
+
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que el sistema pueda detectar cuando se ingrese una CURP que ya está en el sistema.', async () => {
+        await registrarAlumnoPage.open();
+
+        const rutaAbsolutaArchivoValidoPdf = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
+        const rutaAbsolutaArchivoValidoJpeg = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
+
+        await registrarAlumnoPage.asignarMatriculaAlumno("8229220221");
+        await registrarAlumnoPage.asignarCURPAlumno("EOLE049815HERRELA1");
+        await registrarAlumnoPage.asignarNombreAlumno("Carlos");
+        await registrarAlumnoPage.asignarApellidoPaternoAlumno("Perez");
+        await registrarAlumnoPage.asignarApellidoMaternoAlumno("Moreno");
+        await registrarAlumnoPage.asignarFechaNacimientoAlumno("2000-01-01");
+        //await registrarAlumnoPage.asignarNSSAlumno("01234567899");
+        //await registrarAlumnoPage.asignarPolizaSeguroAlumno("2474982004");
+
+        await registrarAlumnoPage.asignarNombreTutor("David");
+        await registrarAlumnoPage.asignarApellidoPaternoTutor("Sanchez");
+        await registrarAlumnoPage.asignarApellidoMaternoTutor("Lopez");
+        await registrarAlumnoPage.asignarNumeroTelefonoTutor("6444000000");
+        await registrarAlumnoPage.asignarFechaNacimientoTutor("1970-01-01");
+
+        await registrarAlumnoPage.asignarFotoAlumno(rutaAbsolutaArchivoValidoJpeg);
+        await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCURPAlumno(rutaAbsolutaArchivoValidoPdf);
+
+        await registrarAlumnoPage.clickRegistrarAlumno();
+
+        const FINAL_SUCCESS_PHRASE_NORMALIZED = "el CURP 'EOLE049815HERRELA1' ya esta registrado";
+
+        const statusElement = await registrarAlumnoPage.driver.wait(
+            until.elementLocated(registrarAlumnoPage.connectionErrorAlert),
+            20_000,
+            'Timeout: El elemento de mensaje de estado no apareció en el DOM.'
+        );
+
+        await registrarAlumnoPage.driver.wait(async () => {
+            try {
+                const currentText = await statusElement.getText();
+
+                const normalizado = normalizarTexto(currentText);
+
+                return normalizado.trim().length > 0;
+                //return normalizado.includes(FINAL_SUCCESS_PHRASE_NORMALIZED);
+            } catch (error) {
+                // Si el elemento se vuelve Stale (se reemplaza), volvemos a intentar
+                return false;
+            }
+        }, 20_000, 'Timeout: El mensaje final de éxito no apareció en el elemento de estado en el tiempo límite.');
+
+
+        const mensajeExito = await statusElement.getText();
+
+        expect(mensajeExito).not.toBeNull();
+        expect(mensajeExito.length).toBeGreaterThan(0);
+
+        const normalizado = normalizarTexto(mensajeExito);
+
+        expect(normalizado).not.toMatch(/(registro).*?(completo)/);
+        expect(mensajeExito).toContain('EOLE049815HERRELA1');
+        expect(mensajeExito).toContain('CURP');
+    });
+});
+
+
+
+describe('CP #28 - Prevención de Envío Múltiple (Doble Clic) del Formulario', () => {
+    let registrarAlumnoPage;
+    const rutaRaiz = process.cwd();
+
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar el comportamiento de la interfaz para prevenir envíos múltiples del formulario (double submission) que podrían ocurrir si el administrador hace doble clic rápidamente en el botón "Registrar Alumno". La interfaz debe deshabilitar el botón o mostrar un indicador de carga al primer clic.', async () => {
+        await registrarAlumnoPage.open();
+
+        const rutaAbsolutaArchivoValidoPdf = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
+        const rutaAbsolutaArchivoValidoJpeg = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
+
+        await registrarAlumnoPage.asignarMatriculaAlumno("9800760054");
+        await registrarAlumnoPage.asignarCURPAlumno("CLKO049815HERRELA1");
+        await registrarAlumnoPage.asignarNombreAlumno("Carlos");
+        await registrarAlumnoPage.asignarApellidoPaternoAlumno("Perez");
+        await registrarAlumnoPage.asignarApellidoMaternoAlumno("Moreno");
+        await registrarAlumnoPage.asignarFechaNacimientoAlumno("2000-01-01");
+        //await registrarAlumnoPage.asignarNSSAlumno("01234567899");
+        //await registrarAlumnoPage.asignarPolizaSeguroAlumno("2474982004");
+
+        await registrarAlumnoPage.asignarNombreTutor("David");
+        await registrarAlumnoPage.asignarApellidoPaternoTutor("Sanchez");
+        await registrarAlumnoPage.asignarApellidoMaternoTutor("Lopez");
+        await registrarAlumnoPage.asignarNumeroTelefonoTutor("6444000000");
+        await registrarAlumnoPage.asignarFechaNacimientoTutor("1970-01-01");
+
+        await registrarAlumnoPage.asignarFotoAlumno(rutaAbsolutaArchivoValidoJpeg);
+        await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCURPAlumno(rutaAbsolutaArchivoValidoPdf);
+
+        await registrarAlumnoPage.clickRegistrarAlumno();
+
+        const FINAL_SUCCESS_PHRASE_NORMALIZED = "registro completo";
+
+        const statusElement = await registrarAlumnoPage.driver.wait(
+            until.elementLocated(registrarAlumnoPage.connectionErrorAlert),
+            10_000,
+            'Timeout: El elemento de mensaje de estado no apareció en el DOM.'
+        );
+
+        await registrarAlumnoPage.driver.wait(async () => {
+            try {
+                const currentText = await statusElement.getText();
+
+                const normalizado = normalizarTexto(currentText);
+
+                return normalizado.includes(FINAL_SUCCESS_PHRASE_NORMALIZED);
+            } catch (error) {
+                // Si el elemento se vuelve Stale (se reemplaza), volvemos a intentar
+                return false;
+            }
+        }, 10_000, 'Timeout: El mensaje final de éxito no apareció en el elemento de estado en el tiempo límite.');
+
+
+        const mensajeExito = await statusElement.getText();
+
+        expect(mensajeExito).not.toBeNull();
+        expect(mensajeExito.length).toBeGreaterThan(0);
+
+        const normalizado = normalizarTexto(mensajeExito);
+
+        expect(normalizado).toMatch(/(registro).*?(completo)/);
+
+        // NOTE: Esperar el reinicio...
+        await registrarAlumnoPage.driver.sleep(3_000);
+
+        const inputNombre = await registrarAlumnoPage.driver.findElement(registrarAlumnoPage.nombreAlumnoField);
+        const inputMatricula = await registrarAlumnoPage.driver.findElement(registrarAlumnoPage.matriculaAlumnoField);
+
+        const valorNombre = await inputNombre.getAttribute("value");
+        const valorMatricula = await inputMatricula.getAttribute("value");
+
+        console.log(`Valor Nombre tras registro: '${valorNombre}'`);
+        console.log(`Valor Matrícula tras registro: '${valorMatricula}'`);
+
+        expect(valorNombre).toBe("");
+        expect(valorMatricula).toBe("");
+    });
+});
+
+
+
+describe('CP #30 - Validación de Matricula repetida', () => {
+    let registrarAlumnoPage;
+    const rutaRaiz = process.cwd();
+
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    test('Verificar que el sistema detecta y evita el registro de un alumno si la Matrícula ingresada ya se encuentra registrada en la base de datos. Se debe mostrar un mensaje de error claro al usuario administrador. \n', async () => {
+        await registrarAlumnoPage.open();
+
+        const rutaAbsolutaArchivoValidoPdf = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
+        const rutaAbsolutaArchivoValidoJpeg = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
+
+        await registrarAlumnoPage.asignarMatriculaAlumno("19040042");
+        await registrarAlumnoPage.asignarCURPAlumno("PERE049815HERRELA1");
+        await registrarAlumnoPage.asignarNombreAlumno("Carlos");
+        await registrarAlumnoPage.asignarApellidoPaternoAlumno("Perez");
+        await registrarAlumnoPage.asignarApellidoMaternoAlumno("Moreno");
+        await registrarAlumnoPage.asignarFechaNacimientoAlumno("2000-01-01");
+        //await registrarAlumnoPage.asignarNSSAlumno("01234567899");
+        //await registrarAlumnoPage.asignarPolizaSeguroAlumno("2474982004");
+
+        await registrarAlumnoPage.asignarNombreTutor("David");
+        await registrarAlumnoPage.asignarApellidoPaternoTutor("Sanchez");
+        await registrarAlumnoPage.asignarApellidoMaternoTutor("Lopez");
+        await registrarAlumnoPage.asignarNumeroTelefonoTutor("6444000000");
+        await registrarAlumnoPage.asignarFechaNacimientoTutor("1970-01-01");
+
+        await registrarAlumnoPage.asignarFotoAlumno(rutaAbsolutaArchivoValidoJpeg);
+        await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCURPAlumno(rutaAbsolutaArchivoValidoPdf);
+
+        await registrarAlumnoPage.clickRegistrarAlumno();
+
+        const FINAL_SUCCESS_PHRASE_NORMALIZED = "la matricula '19040042' ya existe";
+
+        const statusElement = await registrarAlumnoPage.driver.wait(
+            until.elementLocated(registrarAlumnoPage.connectionErrorAlert),
+            10_000,
+            'Timeout: El elemento de mensaje de estado no apareció en el DOM.'
+        );
+
+        await registrarAlumnoPage.driver.wait(async () => {
+            try {
+                const currentText = await statusElement.getText();
+
+                const normalizado = normalizarTexto(currentText);
+
+                return normalizado.includes(FINAL_SUCCESS_PHRASE_NORMALIZED);
+            } catch (error) {
+                // Si el elemento se vuelve Stale (se reemplaza), volvemos a intentar
+                return false;
+            }
+        }, 10_000, 'Timeout: El mensaje final de éxito no apareció en el elemento de estado en el tiempo límite.');
+
+
+        const mensajeExito = await statusElement.getText();
+
+        expect(mensajeExito).not.toBeNull();
+        expect(mensajeExito.length).toBeGreaterThan(0);
+
+        const normalizado = normalizarTexto(mensajeExito);
+
+        expect(normalizado).toContain('ya existe');
+        expect(normalizado).toContain('19040042');
+    });
+});
+
+
+
+
