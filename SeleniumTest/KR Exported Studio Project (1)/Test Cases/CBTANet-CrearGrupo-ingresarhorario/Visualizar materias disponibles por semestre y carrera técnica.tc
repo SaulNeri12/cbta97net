@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>Visualizar materias disponibles por semestre y carrera técnica</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>a6dac76d-cc9c-4206-949d-a10d87571b62</testCaseGuid>
+</TestCaseEntity>

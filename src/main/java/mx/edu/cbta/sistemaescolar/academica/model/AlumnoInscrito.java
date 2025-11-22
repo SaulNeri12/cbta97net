@@ -2,6 +2,8 @@ package mx.edu.cbta.sistemaescolar.academica.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import mx.edu.cbta.sistemaescolar.alumnado.model.Alumno;
+
 import java.time.LocalDate;
 
 @Data

@@ -1,39 +1,45 @@
 package mx.edu.cbta.sistemaescolar.academica.controller;
 
-import jakarta.validation.Valid;
-
-import mx.edu.cbta.sistemaescolar.academica.dto.ClaseDTO;
-import mx.edu.cbta.sistemaescolar.academica.dto.GrupoDTO;
-import mx.edu.cbta.sistemaescolar.academica.mapper.GrupoMapper;
-import mx.edu.cbta.sistemaescolar.academica.model.Clase;
-import mx.edu.cbta.sistemaescolar.academica.model.Grupo;
-import mx.edu.cbta.sistemaescolar.academica.model.Horario;
-import mx.edu.cbta.sistemaescolar.academica.service.AulaService;
-import mx.edu.cbta.sistemaescolar.academica.service.GrupoService;
 import mx.edu.cbta.sistemaescolar.academica.service.exceptions.AulaNoDisponibleException;
 import mx.edu.cbta.sistemaescolar.academica.service.exceptions.GrupoException;
-import mx.edu.cbta.sistemaescolar.curricular.model.Materia;
+import mx.edu.cbta.sistemaescolar.academica.service.GrupoService;
+import mx.edu.cbta.sistemaescolar.academica.service.AulaService;
+import mx.edu.cbta.sistemaescolar.academica.mapper.GrupoMapper;
+import mx.edu.cbta.sistemaescolar.academica.model.Horario;
+import mx.edu.cbta.sistemaescolar.academica.dto.ClaseDTO;
+import mx.edu.cbta.sistemaescolar.academica.dto.GrupoDTO;
+import mx.edu.cbta.sistemaescolar.academica.model.Grupo;
+
+import mx.edu.cbta.sistemaescolar.curricular.service.exception.CicloEscolarNoEncontradoException;
+import mx.edu.cbta.sistemaescolar.curricular.service.CicloEscolarService;
 import mx.edu.cbta.sistemaescolar.curricular.service.MateriaService;
-import mx.edu.cbta.sistemaescolar.personal.model.Docente;
-import mx.edu.cbta.sistemaescolar.personal.service.DocenteService;
+import mx.edu.cbta.sistemaescolar.curricular.model.CicloEscolar;
+import mx.edu.cbta.sistemaescolar.curricular.model.Materia;
+
 import mx.edu.cbta.sistemaescolar.personal.service.exception.DocenteException;
-
-
+import mx.edu.cbta.sistemaescolar.personal.service.DocenteService;
+import mx.edu.cbta.sistemaescolar.personal.model.Docente;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
+import java.util.stream.Collectors;
+import java.util.Optional;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-
+/**
+ * TODO: 1. [ ] Manejar correctamente los codigos de error HTTP de cada respuesta dada por el controlador.
+ * TODO: 2. [ ] Anadir seguridad con Json Web Tokerns para que ningun recurso del controlador sea accedido sin permiso.
+ */
 @RestController
 @RequestMapping("/grupos")
 public class GrupoController {
@@ -53,28 +59,20 @@ public class GrupoController {
     @Autowired
     private MateriaService materiaService;
 
+    @Autowired
+    private CicloEscolarService cicloEscolarService;
+
     @PostMapping
     public ResponseEntity<?> crearGrupoConClases(@Valid @RequestBody GrupoDTO grupoNuevoDTO)
             throws GrupoException {
 
-        System.out.println("=== DEBUG BACKEND - JSON RECIBIDO ===");
-        System.out.println("GrupoDTO completo: " + grupoNuevoDTO);
+        CicloEscolar cicloActivo;
 
-
-        if (grupoNuevoDTO.getClases() != null) {
-            System.out.println("Número de clases: " + grupoNuevoDTO.getClases().size());
-            for (int i = 0; i < grupoNuevoDTO.getClases().size(); i++) {
-                ClaseDTO clase = grupoNuevoDTO.getClases().get(i);
-                System.out.println("Clase " + i + " - materiaId: " + clase.getMateriaId());
-                System.out.println("Clase " + i + " - docenteId: " + clase.getDocenteId());
-                System.out.println("Clase " + i + " - aulaId: " + clase.getAulaId());
-            }
-        } else {
-            System.out.println("CLASES ES NULL!");
+        try {
+            cicloActivo = this.cicloEscolarService.obtenerCicloEscolarActivo();
+        } catch (CicloEscolarNoEncontradoException e) {
+            throw new GrupoException("No se pudo crear el grupo debido a que no hay un ciclo escolar activo.");
         }
-        System.out.println("=== FIN DEBUG ===");
-
-
 
         Map<String, String> response = new HashMap<>();
 
@@ -119,10 +117,8 @@ public class GrupoController {
 
         try {
             validarClase(claseDTO);
-
             response.put("message", "La clase se ha validado con éxito");
             return ResponseEntity.ok(response);
-
         } catch (DocenteException | AulaNoDisponibleException | GrupoException e) {
             response.put("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -134,8 +130,8 @@ public class GrupoController {
     }
 
     /**
-     * Valida si una clase puede ser creada basada en la disponibilidad del aula y docente, ademas de la verificacion
-     * de existencia de sus datos en el sistema. Ademas, evalua si los horarios en que se llevan en la clase acompletan
+     * Valida si una clase puede ser creada basada en la disponibilidad del aula y docente, además de la verificacion
+     * de existencia de sus datos en el sistema. Además, evalua si los horarios en que se llevan en la clase acompletan
      * las horas por semana para dicha clase.
      * @param claseDTO
      * @throws GrupoException
@@ -162,7 +158,10 @@ public class GrupoController {
 
             boolean docenteDisponible = this.docenteService.docenteDisponibleEnHorario(claseDTO.getDocenteId(), horario);
             if (!docenteDisponible) {
-                throw new DocenteException("El docente no está disponible en el horario especificado.");
+                Docente docente = docenteService.obtenerDocentePorId(claseDTO.getDocenteId());
+                String nombreDocente = docente != null ? docente.getNombre() + " " + docente.getApellidoPaterno() + " " + docente.getApellidoMaterno() :
+                        "Docente ID " + claseDTO.getDocenteId();
+                throw new DocenteException("El docente " + nombreDocente + " no está disponible en el horario especificado.");
             }
 
             boolean aulaDisponible = this.aulaService.aulaDisponibleEnHorario(claseDTO.getAulaId(), horario);

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>Ingresar menos horas por materia que las adecuadas</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>3b3735f4-9db7-4de2-8822-ca6788510aa4</testCaseGuid>
+</TestCaseEntity>

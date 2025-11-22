@@ -1,20 +1,24 @@
 package mx.edu.cbta.sistemaescolar.curricular.controller;
 
-import mx.edu.cbta.sistemaescolar.curricular.dto.MateriaDTO;
-import mx.edu.cbta.sistemaescolar.curricular.mapper.MateriaMapper;
-import mx.edu.cbta.sistemaescolar.curricular.model.Grado;
-import mx.edu.cbta.sistemaescolar.curricular.model.Materia;
-import mx.edu.cbta.sistemaescolar.curricular.service.MateriaService;
 import mx.edu.cbta.sistemaescolar.curricular.service.exception.MateriaNoEncontradaException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import mx.edu.cbta.sistemaescolar.curricular.service.MateriaService;
+import mx.edu.cbta.sistemaescolar.curricular.mapper.MateriaMapper;
+import mx.edu.cbta.sistemaescolar.curricular.dto.MateriaDTO;
+import mx.edu.cbta.sistemaescolar.curricular.model.Materia;
+import mx.edu.cbta.sistemaescolar.curricular.model.Grado;
+
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
-import java.util.List;
 import java.util.stream.Collectors;
+import java.util.List;
 
+/**
+ * TODO: 1. [ ] Manejar correctamente los codigos de error HTTP de cada respuesta dada por el controlador.
+ * TODO: 2. [ ] Anadir seguridad con Json Web Tokerns para que ningun recurso del controlador sea accedido sin permiso.
+ */
 @RestController
-
 @RequestMapping("/materias")
 public class MateriaController {
 
@@ -83,9 +87,6 @@ public class MateriaController {
     public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorGradoYCarrera(
             @PathVariable Integer grado,
             @PathVariable Long carreraTecnicaId) {
-
-
-
 
         List<Materia> materias = materiaService.obtenerMateriasPorGradoYCarrera(intToEnum(grado), carreraTecnicaId);
         List<MateriaDTO> materiasDTO = materias.stream()

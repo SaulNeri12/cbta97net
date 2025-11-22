@@ -1,21 +1,21 @@
 package mx.edu.cbta.sistemaescolar.curricular.controller;
 
-import mx.edu.cbta.sistemaescolar.curricular.dto.AreaPropedeuticaDTO;
-import mx.edu.cbta.sistemaescolar.curricular.dto.MateriaDTO;
-import mx.edu.cbta.sistemaescolar.curricular.mapper.AreaPropedeuticaMapper;
-import mx.edu.cbta.sistemaescolar.curricular.model.AreaPropedeutica;
 import mx.edu.cbta.sistemaescolar.curricular.service.AreaPropedeuticaService;
-import org.apache.coyote.Response;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import mx.edu.cbta.sistemaescolar.curricular.mapper.AreaPropedeuticaMapper;
+import mx.edu.cbta.sistemaescolar.curricular.dto.AreaPropedeuticaDTO;
+import mx.edu.cbta.sistemaescolar.curricular.model.AreaPropedeutica;
+
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.List;
 
-
+/**
+ * TODO: 1. [ ] Manejar correctamente los codigos de error HTTP de cada respuesta dada por el controlador.
+ * TODO: 2. [ ] Anadir seguridad con Json Web Tokerns para que ningun recurso del controlador sea accedido sin permiso.
+ */
 @RestController
 @RequestMapping("/areas-propedeuticas")
 public class AreaPropedeuticaController {
