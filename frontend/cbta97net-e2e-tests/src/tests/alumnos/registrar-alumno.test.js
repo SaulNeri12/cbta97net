@@ -22,6 +22,10 @@ describe('CP #1 - Foto de Alumno con Formato Inválido', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que la foto del alumno seleccionada detecta cuando una imagen no tiene el formato correcto (solo se acepta JPEG, PNG, WEBP).', async () => {
         await registrarAlumnoPage.open();
 
@@ -65,6 +69,10 @@ describe('CP #2 - Matrícula con Formato Inválido', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que el sistema valida correctamente las matrículas de alumnos. Las matrículas deben contener solamente 8 dígitos fijos.\n', async () => {
         const matriculaIncorrecta = "6502mos";
         const matriculaValida = "19040042";
@@ -96,6 +104,10 @@ describe('CP #3 - CURP con Formato Inválido', () => {
     beforeAll(() => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
+
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
 
     test('Verificar que el sistema valida correctamente la CURP a registrar. El sistema debe mostrar un mensaje indicando que la CURP ingresada no cumple con el formato correcto.', async () => {
         let curpIncorrecta = "111???xxx";
@@ -134,6 +146,10 @@ describe('CP #4 - Nombre del Alumno con Formato Inválido', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que el sistema valida correctamente el nombre del alumno a registrar. El sistema debe mostrar un mensaje indicando que el nombre ingresado no cumple con el formato requerido.\n', async () => {
         let nombreNoValido = "C?rl?s";
         const nombreValido = "Carlos";
@@ -166,6 +182,10 @@ describe('CP #5 - Apellido Paterno del Alumno con Formato Inválido', () => {
     beforeAll(() => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
+
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
 
     test('Verificar que el sistema valida correctamente el apellido paterno del alumno a registrar. El sistema debe mostrar un mensaje indicando que el apellido ingresado no cumple con el formato requerido. El formato no permite números ni símbolos.', async () => {
         let apellidoNoValido = "P3r3z?";
@@ -201,6 +221,10 @@ describe('CP #6 - Apellido Materno del Alumno con Formato Inválido', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que el sistema valida correctamente el apellido materno del alumno a registrar. El sistema debe mostrar un mensaje indicando que el apellido ingresado no cumple con el formato requerido. El formato no permite números ni símbolos.', async () => {
         let apellidoNoValido = "M0reN0?";
         const apellidoValido = "Moreno";
@@ -233,6 +257,10 @@ describe('CP #7 - Fecha de Nacimiento del Alumno no válida', () => {
     beforeAll(() => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
+
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
 
     test('Verificar que el sistema detecta correctamente cuando se selecciona una fecha de nacimiento igual o posterior a la actual.', async () => {
         const hoy = new Date();
@@ -285,6 +313,10 @@ describe('CP #8 - Número de Seguro Social (NSS) del Alumno no válido', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que el sistema detecta cuando el NSS del alumno tiene un formato incorrecto. El formato es de 11 dígitos.\n', async () => {
 
         let nssNoValido = "N555???";
@@ -334,6 +366,10 @@ describe('CP #9 - Póliza de Seguro del Alumno no válida', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que el sistema detecta cuando la póliza de seguro del alumno tiene un formato incorrecto. El formato aceptado son solo números. (sin rango especificado).', async () => {
 
         let polizaNoValida = "N555???";
@@ -372,6 +408,10 @@ describe('CP #10 - Nombre del Tutor con Formato Inválido', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que el sistema valida correctamente el nombre del tutor legal del alumno. El sistema debe mostrar un mensaje indicando que el nombre ingresado no cumple con el formato requerido. El formato no permite números ni símbolos.', async () => {
         let nombreNoValido = "D4vid?";
         const nombreValido = "David";
@@ -406,6 +446,10 @@ describe('CP #11 - Apellido Paterno del tutor con Formato Inválido', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que el sistema valida correctamente el apellido paterno del tutor legal del alumno. El sistema debe mostrar un mensaje indicando que el apellido paterno ingresado no cumple con el formato requerido. El formato no permite números ni símbolos.', async () => {
         let apellidoNoValido = "P3r3z?";
         const apellidoValido = "Perez";
@@ -439,6 +483,10 @@ describe('CP #12 - Apellido Materno del tutor con Formato Inválido', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que el sistema valida correctamente el apellido materno del tutor legal del alumno. El sistema debe mostrar un mensaje indicando que el apellido materno ingresado no cumple con el formato requerido. El formato no permite números ni símbolos.', async () => {
         let apellidoNoValido = "P3r3z???";
         const apellidoValido = "Perez";
@@ -471,6 +519,10 @@ describe('CP #13 - Fecha de Nacimiento del Tutor no válida (Debe tener 18 años
     beforeAll(() => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
+
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
 
     test('Verificar que el sistema valida correctamente que el tutor legal tiene 18 años o más.', async () => {
 
@@ -531,6 +583,10 @@ describe('CP #14 - Validar el número de teléfono del tutor', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que el sistema valida que el número del teléfono del tutor no sea mayor a 10 dígitos o menor, y que no tenga caracteres especiales.', async () => {
 
         const telefonoInvalido = "644L01311";
@@ -578,6 +634,10 @@ describe('CP #15 - Documento Acta de Nacimiento - Formato y Tamaño', () => {
     beforeAll(() => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
+
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
 
     test('Verificar la validación de formato (solo PDF) y tamaño (max 10MB) del Acta de Nacimiento.', async () => {
         await registrarAlumnoPage.open();
@@ -636,6 +696,10 @@ describe('CP #16 - Documento Certificado de Secundaria - Formato y Tamaño', () 
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar la validación de formato (solo PDF) y tamaño (max 10MB) del Certificado de Secundaria.', async () => {
         await registrarAlumnoPage.open();
         const rutaRaiz = process.cwd();
@@ -683,6 +747,10 @@ describe('CP #17 - Documento CURP del Alumno - Formato y Tamaño', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar la validación de formato (solo PDF) y tamaño (max 10MB) del Documento CURP.', async () => {
         await registrarAlumnoPage.open();
         const rutaRaiz = process.cwd();
@@ -722,6 +790,10 @@ describe('CP #18 - Especificación de Condición Especial del Alumno', () => {
     beforeAll(() => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
+
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
 
     test('Verificar que al seleccionar la opción de Condición Especial se muestra/oculta el campo de descripción.', async () => {
         await registrarAlumnoPage.open();
@@ -776,6 +848,10 @@ describe('CP #20 - Intento de registro de alumno sin asignar documentos', () => 
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test(`Verificar que el sistema exige los documentos al intentar registrar. (Probando el error en el campo: ${documentoFaltante})`, async () => {
         await registrarAlumnoPage.open();
 
@@ -806,6 +882,10 @@ describe('CP #21 - Problema de conexión al intentar Registrar Alumno', () => {
     beforeAll(() => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
+
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
 
     test('Verificar que un fallo de conexión al intentar registrar genera un mensaje de error.', async () => {
         await registrarAlumnoPage.open();
@@ -865,6 +945,10 @@ describe('CP #22 - Registro de Alumno exitoso', () => {
     beforeAll(() => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
+
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
 
     test('Verificar que el sistema registra correctamente al alumno cuando todos sus datos cumplen con el formato correcto al igual que sus documentos.', async () => {
         await registrarAlumnoPage.open();
@@ -948,6 +1032,10 @@ describe('CP #23 - Validación campos opcionales NSS y Póliza de Seguro', () =>
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que el sistema pueda registrar a un alumno aún cuando se omitan los campos de Número de Seguro Social (NSS) y la Póliza de Seguro.\n', async () => {
         await registrarAlumnoPage.open();
 
@@ -1027,6 +1115,10 @@ describe('CP #24 - Validación de campos contra inyecciones SQL', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que el sistema sea resiliente ante inyecciones SQL.', async () => {
         let injeccionSQL = "; DROP TABLE alumnos; -- ";
         const nombreValido = "Carlos";
@@ -1048,6 +1140,75 @@ describe('CP #24 - Validación de campos contra inyecciones SQL', () => {
 });
 
 
+describe('CP #25 - Recuperación de datos ante reinicio', () => {
+    let registrarAlumnoPage;
+    const rutaRaiz = process.cwd();
+
+    const normalizarTexto = (str) => str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    beforeAll(() => {
+        registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
+    });
+
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
+    test('Verificar que el proceso se recupere después de que la página se haya reiniciado.\n', async () => {
+        await registrarAlumnoPage.open();
+
+        const rutaAbsolutaArchivoValidoPdf = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
+        const rutaAbsolutaArchivoValidoJpeg = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
+
+        await registrarAlumnoPage.asignarMatriculaAlumno("98007600");
+        await registrarAlumnoPage.asignarCURPAlumno("CLKO049815HERRELA1");
+        await registrarAlumnoPage.asignarNombreAlumno("Carlos");
+        await registrarAlumnoPage.asignarApellidoPaternoAlumno("Perez");
+        await registrarAlumnoPage.asignarApellidoMaternoAlumno("Moreno");
+        await registrarAlumnoPage.asignarFechaNacimientoAlumno("2000-01-01");
+        //await registrarAlumnoPage.asignarNSSAlumno("01234567899");
+        //await registrarAlumnoPage.asignarPolizaSeguroAlumno("2474982004");
+
+        await registrarAlumnoPage.asignarNombreTutor("David");
+        await registrarAlumnoPage.asignarApellidoPaternoTutor("Sanchez");
+        await registrarAlumnoPage.asignarApellidoMaternoTutor("Lopez");
+        await registrarAlumnoPage.asignarNumeroTelefonoTutor("6444000000");
+        await registrarAlumnoPage.asignarFechaNacimientoTutor("1970-01-01");
+
+        await registrarAlumnoPage.asignarFotoAlumno(rutaAbsolutaArchivoValidoJpeg);
+        await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCURPAlumno(rutaAbsolutaArchivoValidoPdf);
+
+        await registrarAlumnoPage.open();
+
+        // NOTE: Esperar el reinicio...
+        await registrarAlumnoPage.driver.sleep(3_000);
+
+        const inputNombre = await registrarAlumnoPage.driver.findElement(registrarAlumnoPage.nombreAlumnoField);
+        const inputMatricula = await registrarAlumnoPage.driver.findElement(registrarAlumnoPage.matriculaAlumnoField);
+        const inputApellidoPaternoAlumno = await registrarAlumnoPage.driver.findElement(registrarAlumnoPage.apellidoPaternoAlumnoField);
+        const inputApellidoMaternoAlumno = await registrarAlumnoPage.driver.findElement(registrarAlumnoPage.apellidoMaternoAlumnoField);
+        const inputCURPAlumno = await registrarAlumnoPage.driver.findElement(registrarAlumnoPage.curpAlumnoField)
+
+
+        const valorNombreAlumno = await inputNombre.getAttribute("value");
+        const valorMatriculaAlumno = await inputMatricula.getAttribute("value");
+        const valorApellidoPaternoAlumno = await inputApellidoPaternoAlumno.getAttribute("value");
+        const valorApellidoMaternoAlumno = await inputApellidoMaternoAlumno.getAttribute("value");
+        const valorCURPAlumno = await inputCURPAlumno.getAttribute("value");
+
+        expect(valorMatriculaAlumno).toBe("98007600");
+        expect(valorNombreAlumno).toBe('Carlos');
+        expect(valorApellidoPaternoAlumno).toBe('Perez');
+        expect(valorApellidoMaternoAlumno).toBe('Moreno');
+        expect(valorCURPAlumno).toBe('CLKO049815HERRELA1');
+    });
+});
+
 
 
 describe('CP #27 - Validación de CURP repetida', () => {
@@ -1062,6 +1223,10 @@ describe('CP #27 - Validación de CURP repetida', () => {
     beforeAll(() => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
+
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
 
     test('Verificar que el sistema pueda detectar cuando se ingrese una CURP que ya está en el sistema.', async () => {
         await registrarAlumnoPage.open();
@@ -1141,6 +1306,10 @@ describe('CP #28 - Prevención de Envío Múltiple (Doble Clic) del Formulario',
     beforeAll(() => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
+
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
 
     test('Verificar el comportamiento de la interfaz para prevenir envíos múltiples del formulario (double submission) que podrían ocurrir si el administrador hace doble clic rápidamente en el botón "Registrar Alumno". La interfaz debe deshabilitar el botón o mostrar un indicador de carga al primer clic.', async () => {
         await registrarAlumnoPage.open();
@@ -1233,6 +1402,10 @@ describe('CP #30 - Validación de Matricula repetida', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
+    afterAll(async () => {
+        await registrarAlumnoPage.clearLocalStorageBackup();
+    })
+
     test('Verificar que el sistema detecta y evita el registro de un alumno si la Matrícula ingresada ya se encuentra registrada en la base de datos. Se debe mostrar un mensaje de error claro al usuario administrador. \n', async () => {
         await registrarAlumnoPage.open();
 
@@ -1294,7 +1467,3 @@ describe('CP #30 - Validación de Matricula repetida', () => {
         expect(normalizado).toContain('19040042');
     });
 });
-
-
-
-

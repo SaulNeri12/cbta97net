@@ -225,6 +225,15 @@ class RegistrarAlumnoPage {
         }
     }
 
+    /**
+     * Limpia explícitamente el respaldo de datos del LocalStorage.
+     * La clave 'registroAlumnoData' fue la utilizada para guardar los datos del formulario.
+     * @returns {Promise<void>}
+     */
+    async clearLocalStorageBackup() {
+        await this.driver.executeScript(`window.localStorage.removeItem('registroAlumnoData');`);
+    }
+
     async llenarCamposExceptoDocumentos(registrarAlumnoPage) {
 
         // Datos Válidos para Alumno (pasando CP #2 a #14)
