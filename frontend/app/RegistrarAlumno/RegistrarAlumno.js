@@ -4,10 +4,74 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkCondicion = document.getElementById("condicionEspecial");
     const campoDescCondicion = document.getElementById("campo-descripcion-condicion");
 
-    // Ya no se necesita cargar tutores académicos
-    // const selectTutorAcademico = document.getElementById("tutorAcademico");
+    const STORAGE_KEY = 'registroAlumnoData';
 
-    // --- LÓGICA PARA VISTA PREVIA DE FOTO ---
+    const formFieldIds = [
+        'matricula', 'curp', 'nombre', 'apellidoPaterno', 'apellidoMaterno',
+        'fechaNacimiento', 'nss', 'poliza', 'condicionEspecial', 'condicionDescripcion',
+        'tutor_telefono', 'tutor_fechaNacimiento', 'tutor_nombre', 'tutor_apellidoPaterno', 'tutor_apellidoMaterno'
+    ];
+
+    function saveFormData() {
+        const data = {};
+        formFieldIds.forEach(id => {
+            const field = document.getElementById(id);
+            if (field) {
+                if (field.type === 'checkbox') {
+                    data[id] = field.checked;
+                } else if (field.type !== 'file') {
+                    data[id] = field.value;
+                }
+            }
+        });
+
+        // Guardar en localStorage
+        if (Object.keys(data).length > 0) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (e) {
+                console.error("Error al guardar en localStorage:", e);
+            }
+        }
+    }
+
+    function loadFormData() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (!savedData) return;
+
+            const data = JSON.parse(savedData);
+
+            formFieldIds.forEach(id => {
+                const field = document.getElementById(id);
+                if (field && data[id] !== undefined) {
+                    if (field.type === 'checkbox') {
+                        field.checked = data[id];
+                        // Disparar evento 'change' para ejecutar la lógica de visibilidad/estado
+                        field.dispatchEvent(new Event('change'));
+                    } else if (field.type !== 'file') {
+                        field.value = data[id];
+                    }
+                }
+            });
+            console.log("Datos de formulario cargados desde el respaldo (localStorage).");
+        } catch (e) {
+            console.error("Error al cargar datos desde localStorage:", e);
+            // Limpiar datos corruptos
+            localStorage.removeItem(STORAGE_KEY);
+        }
+    }
+
+    loadFormData();
+
+    formFieldIds.forEach(id => {
+        const field = document.getElementById(id);
+        if (field && field.type !== 'file') {
+            const eventType = (field.type === 'text' || field.tagName === 'TEXTAREA' || field.type === 'number') ? 'input' : 'change';
+            field.addEventListener(eventType, saveFormData);
+        }
+    });
+
     const fotoInput = document.getElementById("fotoAlumno");
     const fotoPreview = document.getElementById("fotoPreview");
     const placeholderImage = "../resources/placeholder-user.webp";
@@ -24,8 +88,101 @@ document.addEventListener("DOMContentLoaded", () => {
             fotoPreview.src = placeholderImage;
         }
     });
-    // --- FIN DE LÓGICA DE VISTA PREVIA ---
 
+
+    const setValidation = (id, conditionFn, errorMessage) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+
+        const validate = () => {
+            const value = input.value;
+            if (value && !conditionFn(value)) {
+                input.setCustomValidity(errorMessage);
+            } else {
+                input.setCustomValidity("");
+            }
+        };
+
+        input.addEventListener("input", validate);
+        input.addEventListener("change", validate);
+        input.addEventListener("blur", validate);
+
+        input.manualValidate = validate;
+
+        // Ejecutar validación inicial
+        validate();
+    };
+
+    const noNumerosSimbolos = val => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val);
+    const curpValido = val => /^[A-Z0-9]{18}$/.test(val);
+
+
+    setValidation("matricula", (val) => /^\d{8}$/.test(val), "La matrícula debe contener exactamente 8 dígitos.");
+    setValidation("nombre", noNumerosSimbolos, "El formato del nombre no permite números ni símbolos.")
+    setValidation("apellidoPaterno", noNumerosSimbolos, "El formato del apellido paterno no permite números ni símbolos.");
+    setValidation("apellidoMaterno", noNumerosSimbolos, "El formato del apellido materno no permite números ni símbolos.");
+    setValidation("curp", curpValido, "El formato de la CURP es incorrecto.")
+
+    setValidation("fechaNacimiento", (val) => {
+        if (!val) return true;
+        const fecha = new Date(val);
+        const hoy = new Date();
+        return fecha < hoy;
+    }, "La fecha de nacimiento debe ser anterior a la fecha actual.");
+
+    setValidation("nss", (val) => {
+        if (!val) return true;
+        return /^\d{11}$/.test(val);
+    }, "El NSS debe tener exactamente 11 dígitos.");
+
+    setValidation("poliza", (val) => {
+        if (!val) return true;
+        return /^\d+$/.test(val);
+    }, "El formato de la póliza solo acepta números.");
+
+    setValidation("tutor_nombre", (val) => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val), "El formato del nombre no permite números ni símbolos.");
+    setValidation("tutor_apellidoPaterno", (val) => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val), "El formato del apellido paterno no permite números ni símbolos.");
+    setValidation("tutor_apellidoMaterno", (val) => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val), "El formato del apellido materno no permite números ni símbolos.");
+
+
+    setValidation("tutor_fechaNacimiento", (val) => {
+        if (!val) return true;
+        const fechaLimite = new Date();
+        fechaLimite.setFullYear(fechaLimite.getFullYear() - 18);
+        fechaLimite.setHours(23, 59, 59, 999);
+        const fechaNac = new Date(val + 'T00:00:00');
+        return fechaNac.getTime() <= fechaLimite.getTime();
+
+    }, "La edad del tutor debe ser de 18 años o más.");
+
+    // CP #14: Teléfono del Tutor (10 dígitos)
+    setValidation("tutor_telefono", (val) => /^\d{10}$/.test(val), "El formato del teléfono debe ser de 10 dígitos.");
+
+    // Validar Archivos (PDF y Peso < 10MB) - Función Reutilizable
+    const validarArchivo = (id, nombreArchivo) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+
+        const validateFile = () => {
+            const file = input.files[0];
+            if (file) {
+                if (file.type !== "application/pdf") {
+                    input.setCustomValidity(`El documento ${nombreArchivo} debe estar en formato PDF.`);
+                } else if (file.size > 10 * 1024 * 1024) { // 10MB en bytes
+                    input.setCustomValidity(`El documento ${nombreArchivo} excede el tamaño máximo de 10MB.`);
+                } else {
+                    input.setCustomValidity("");
+                }
+            } else {
+                input.setCustomValidity("");
+            }
+        };
+        input.addEventListener("change", validateFile);
+    };
+
+    validarArchivo("actaNacimiento", "Acta de Nacimiento");
+    validarArchivo("certificadoSecundaria", "Certificado de Secundaria");
+    validarArchivo("documentoCurp", "Documento CURP");
 
     // Lógica para mostrar/ocultar descripción de condición
     checkCondicion.addEventListener("change", () => {
@@ -36,8 +193,6 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("condicionDescripcion").value = "";
         }
     });
-
-    // --- FUNCIÓN CARGAR TUTORES ACADÉMICOS ELIMINADA ---
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -72,8 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
             condicionEspecial: document.getElementById("condicionEspecial").checked,
             condicionEspecialDescripcion: document.getElementById("condicionDescripcion").value || null,
 
-            tutorLegal: tutorLegal, // <-- Objeto TutorDTO anidado
-            // tutorAcademicoId ya no se envía
+            tutorLegal: tutorLegal,
         };
 
         // --- RECOPILAR TODOS LOS ARCHIVOS ---
@@ -119,8 +273,9 @@ document.addEventListener("DOMContentLoaded", () => {
             await uploadDocument(matricula, curpFile, "CURP");
             showStatus(`Documento CURP subido. ¡Registro completo!`, "success");
 
-            // 4. Limpiar formulario
             form.reset();
+            localStorage.removeItem(STORAGE_KEY);
+
             campoDescCondicion.style.display = "none";
             fotoPreview.src = placeholderImage;
             btn.disabled = false;
@@ -165,6 +320,9 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         form.reset();
         clearStatus();
+
+        localStorage.removeItem(STORAGE_KEY);
+
         campoDescCondicion.style.display = "none";
         fotoPreview.src = placeholderImage;
     });
