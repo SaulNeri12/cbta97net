@@ -55,36 +55,22 @@ document.addEventListener("DOMContentLoaded", () => {
         validate();
     };
 
-    /*
-    const setValidation = (id, condition, message) => {
-        const input = document.getElementById(id);
-        if (!input) return; // Validación de seguridad por si el elemento no existe
-
-        // Función de validación interna
-        const validate = () => {
-            if (condition(input.value, input)) {
-                input.setCustomValidity(""); // Válido
-            } else {
-                input.setCustomValidity(message); // Inválido
-            }
-        };
-
-        // Escuchar eventos para validación en tiempo real
-        input.addEventListener("input", validate);
-        input.addEventListener("change", validate);
-    };*/
+    const noNumerosSimbolos = val => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val);
+    const curpValido = val => /^[A-Z0-9]{18}$/.test(val);
 
     // CP #2: Matrícula (8 dígitos fijos)
     setValidation("matricula", (val) => /^\d{8}$/.test(val), "La matrícula debe contener exactamente 8 dígitos.");
 
     // CP #4: Nombre del Alumno (Solo letras y espacios, sin números ni símbolos)
-    setValidation("nombre", (val) => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val), "El formato del nombre no permite números ni símbolos.");
+    setValidation("nombre", noNumerosSimbolos, "El formato del nombre no permite números ni símbolos.");
 
     // CP #5: Apellido Paterno del Alumno
-    setValidation("apellidoPaterno", (val) => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val), "El formato del apellido paterno no permite números ni símbolos.");
+    setValidation("apellidoPaterno", noNumerosSimbolos, "El formato del apellido paterno no permite números ni símbolos.");
 
     // CP #6: Apellido Materno del Alumno
-    setValidation("apellidoMaterno", (val) => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val), "El formato del apellido materno no permite números ni símbolos.");
+    setValidation("apellidoMaterno", noNumerosSimbolos, "El formato del apellido materno no permite números ni símbolos.");
+
+    setValidation("curp", curpValido, "El formato de la CURP es incorrecto.")
 
     // CP #7: Fecha de Nacimiento del Alumno (Debe ser anterior a la fecha actual)
     setValidation("fechaNacimiento", (val) => {

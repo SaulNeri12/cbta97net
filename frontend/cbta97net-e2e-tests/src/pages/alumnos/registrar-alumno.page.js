@@ -120,8 +120,16 @@ class RegistrarAlumnoPage {
     async asignarFechaNacimientoTutor(fechaNacimiento) {
         const element = await this.driver.findElement(this.fechaNacimientoTutorField);
         await element.clear();
-        await element.sendKeys(fechaNacimiento);
-        await this.driver.findElement(By.css('body')).click();
+
+        await this.driver.executeScript("arguments[0].value = arguments[1];", element, fechaNacimiento);
+
+        // 2. Disparar eventos MÚLTIPLES para despertar al navegador
+        // Algunos frameworks escuchan 'input', otros 'change', otros 'blur'. Disparamos todos.
+        await this.driver.executeScript(`
+            arguments[0].dispatchEvent(new Event('input', { bubbles: true }));
+            arguments[0].dispatchEvent(new Event('change', { bubbles: true }));
+            arguments[0].dispatchEvent(new Event('blur', { bubbles: true }));
+        `, element);
     }
 
     async introducirDocumentoActaNacimientoAlumno(rutaActaNacimiento) {
