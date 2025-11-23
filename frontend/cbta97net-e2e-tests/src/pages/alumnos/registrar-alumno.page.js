@@ -112,11 +112,16 @@ class RegistrarAlumnoPage {
     }
 
     async asignarNumeroTelefonoTutor(telefono) {
-        await this.driver.findElement(this.telefonoTutorField).sendKeys(telefono);
+        const element = this.driver.findElement(this.telefonoTutorField);
+        element.clear();
+        element.sendKeys(telefono);
     }
 
     async asignarFechaNacimientoTutor(fechaNacimiento) {
-        await this.driver.findElement(this.fechaNacimientoTutorField).sendKeys(fechaNacimiento);
+        const element = await this.driver.findElement(this.fechaNacimientoTutorField);
+        await element.clear();
+        await element.sendKeys(fechaNacimiento);
+        await this.driver.findElement(By.css('body')).click();
     }
 
     async introducirDocumentoActaNacimientoAlumno(rutaActaNacimiento) {
@@ -266,14 +271,26 @@ class RegistrarAlumnoPage {
      * Esto funciona para inputs con required, type="email", etc.
      */
     async getNativeValidationError(locator) {
+
+
+        const element = await this.driver.findElement(locator);
+
+        // 1. Forzar la visualización de la burbuja nativa ANTES de leerla
+        // La validación ya se ejecutó con el evento 'change', esto solo la muestra/actualiza.
+        await this.driver.executeScript("arguments[0].reportValidity();", element);
+
+        // 2. Leer el mensaje
+        return element.getAttribute('validationMessage');
+        /*
         const element = await this.driver.findElement(locator);
         const validationMessage = await this.driver.executeScript(
             // El script usa el API de validación nativa del elemento DOM
             'return arguments[0].validationMessage;',
             element // Pasa el elemento de Selenium como argumento[0]
         );
-
         return validationMessage;
+
+         */
     }
 
     /**

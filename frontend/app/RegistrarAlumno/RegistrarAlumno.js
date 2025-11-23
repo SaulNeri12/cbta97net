@@ -24,7 +24,167 @@ document.addEventListener("DOMContentLoaded", () => {
             fotoPreview.src = placeholderImage;
         }
     });
-    // --- FIN DE LÓGICA DE VISTA PREVIA ---
+
+
+    const setValidation = (id, conditionFn, errorMessage) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+
+        // Función de validación única
+        const validate = () => {
+            const value = input.value;
+            if (value && !conditionFn(value)) {
+                input.setCustomValidity(errorMessage);
+            } else {
+                input.setCustomValidity(""); // Limpiar el error si es válido o vacío
+            }
+
+            // ¡¡¡LÍNEA ELIMINADA!!! Ya NO forzamos reportValidity() aquí.
+        };
+
+        // Escuchar eventos estándar
+        input.addEventListener("input", validate);
+        input.addEventListener("change", validate);
+        input.addEventListener("blur", validate);
+
+        // Mantenemos esta función para que los tests puedan forzar la validación
+        // sin que el test tenga que depender de reportValidity().
+        input.manualValidate = validate;
+
+        // Ejecutar validación inicial
+        validate();
+    };
+
+    /*
+    const setValidation = (id, condition, message) => {
+        const input = document.getElementById(id);
+        if (!input) return; // Validación de seguridad por si el elemento no existe
+
+        // Función de validación interna
+        const validate = () => {
+            if (condition(input.value, input)) {
+                input.setCustomValidity(""); // Válido
+            } else {
+                input.setCustomValidity(message); // Inválido
+            }
+        };
+
+        // Escuchar eventos para validación en tiempo real
+        input.addEventListener("input", validate);
+        input.addEventListener("change", validate);
+    };*/
+
+    // CP #2: Matrícula (8 dígitos fijos)
+    setValidation("matricula", (val) => /^\d{8}$/.test(val), "La matrícula debe contener exactamente 8 dígitos.");
+
+    // CP #4: Nombre del Alumno (Solo letras y espacios, sin números ni símbolos)
+    setValidation("nombre", (val) => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val), "El formato del nombre no permite números ni símbolos.");
+
+    // CP #5: Apellido Paterno del Alumno
+    setValidation("apellidoPaterno", (val) => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val), "El formato del apellido paterno no permite números ni símbolos.");
+
+    // CP #6: Apellido Materno del Alumno
+    setValidation("apellidoMaterno", (val) => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val), "El formato del apellido materno no permite números ni símbolos.");
+
+    // CP #7: Fecha de Nacimiento del Alumno (Debe ser anterior a la fecha actual)
+    setValidation("fechaNacimiento", (val) => {
+        if (!val) return true; // Dejar que 'required' maneje el vacío
+        const fecha = new Date(val);
+        const hoy = new Date();
+        return fecha < hoy;
+    }, "La fecha de nacimiento debe ser anterior a la fecha actual.");
+
+    // CP #8: NSS (11 dígitos)
+    setValidation("nss", (val) => {
+        if (!val) return true; // Campo opcional según lógica, si es requerido quitar esta línea
+        return /^\d{11}$/.test(val);
+    }, "El NSS debe tener exactamente 11 dígitos.");
+
+    // CP #9: Póliza de Seguro (Solo números)
+    setValidation("poliza", (val) => {
+        if (!val) return true;
+        return /^\d+$/.test(val);
+    }, "El formato de la póliza solo acepta números.");
+
+    // CP #10: Nombre del Tutor
+    setValidation("tutor_nombre", (val) => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val), "El formato del nombre no permite números ni símbolos.");
+
+    // CP #11: Apellido Paterno del Tutor
+    setValidation("tutor_apellidoPaterno", (val) => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val), "El formato del apellido paterno no permite números ni símbolos.");
+
+    // CP #12: Apellido Materno del Tutor
+    setValidation("tutor_apellidoMaterno", (val) => /^[a-zA-Z\u00C0-\u017F\s]+$/.test(val), "El formato del apellido materno no permite números ni símbolos.");
+
+    /*
+    // CP #13: Fecha de Nacimiento del Tutor (Mayor de 18 años)
+    setValidation("tutor_fechaNacimiento", (val) => {
+        if (!val) return true;
+        const fechaNac = new Date(val);
+        const hoy = new Date();
+        let edad = hoy.getFullYear() - fechaNac.getFullYear();
+        const mes = hoy.getMonth() - fechaNac.getMonth();
+        if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+        if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+            edad--;
+        }
+        return edad >= 18;
+    }, "La edad del tutor debe ser mayor o igual a 18 años.");
+*/
+
+
+
+
+    setValidation("tutor_fechaNacimiento", (val) => {
+        if (!val) return true;
+
+        // 1. Calcular la fecha límite (Hoy, hace 18 años)
+        const fechaLimite = new Date();
+        fechaLimite.setFullYear(fechaLimite.getFullYear() - 18);
+        // Aseguramos que la hora no interfiera (aunque la comparación getTime() es precisa)
+        fechaLimite.setHours(23, 59, 59, 999);
+
+        // 2. Crear la fecha de nacimiento (y forzar la hora a medianoche para evitar desplazamiento de zona horaria)
+        const fechaNac = new Date(val + 'T00:00:00');
+
+        // La fecha de nacimiento (fechaNac) DEBE ser menor o igual a la fecha límite (fechaLimite)
+        // es decir, el tutor debe haber nacido ANTES o EXACTAMENTE hace 18 años.
+        return fechaNac.getTime() <= fechaLimite.getTime();
+
+    }, "La edad del tutor debe ser de 18 años o más.");
+
+    // CP #14: Teléfono del Tutor (10 dígitos)
+    setValidation("tutor_telefono", (val) => /^\d{10}$/.test(val), "El formato del teléfono debe ser de 10 dígitos.");
+
+    // Validar Archivos (PDF y Peso < 10MB) - Función Reutilizable
+    const validarArchivo = (id, nombreArchivo) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+
+        const validateFile = () => {
+            const file = input.files[0];
+            if (file) {
+                if (file.type !== "application/pdf") {
+                    input.setCustomValidity(`El documento ${nombreArchivo} debe estar en formato PDF.`);
+                } else if (file.size > 10 * 1024 * 1024) { // 10MB en bytes
+                    input.setCustomValidity(`El documento ${nombreArchivo} excede el tamaño máximo de 10MB.`);
+                } else {
+                    input.setCustomValidity("");
+                }
+            } else {
+                input.setCustomValidity(""); // Si es 'required', el navegador lo maneja
+            }
+        };
+        input.addEventListener("change", validateFile);
+    };
+
+    // CP #15: Acta de Nacimiento
+    validarArchivo("actaNacimiento", "Acta de Nacimiento");
+
+    // CP #16: Certificado de Secundaria
+    validarArchivo("certificadoSecundaria", "Certificado de Secundaria");
+
+    // CP #17: Documento CURP
+    validarArchivo("documentoCurp", "Documento CURP");
 
 
     // Lógica para mostrar/ocultar descripción de condición

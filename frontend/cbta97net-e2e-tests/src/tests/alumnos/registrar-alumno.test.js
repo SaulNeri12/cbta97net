@@ -293,16 +293,20 @@ describe('CP #8 - Número de Seguro Social (NSS) del Alumno no válido', () => {
         // NSS No valido #1
         await registrarAlumnoPage.asignarNSSAlumno(nssNoValido);
         let mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.nssAlumnoField);
-        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+        expect(normalizarTexto(mensajeValidacion)).toContain('nss');
         expect(normalizarTexto(mensajeValidacion)).toContain('11');
+        expect(normalizarTexto(mensajeValidacion)).toContain('digitos');
+        expect(normalizarTexto(mensajeValidacion)).toContain('exactamente');
 
 
         // NSS No valido #2
         nssNoValido = "1234567890########";
         await registrarAlumnoPage.asignarNSSAlumno(nssNoValido);
         mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.nssAlumnoField);
-        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+        expect(normalizarTexto(mensajeValidacion)).toContain('nss');
         expect(normalizarTexto(mensajeValidacion)).toContain('11');
+        expect(normalizarTexto(mensajeValidacion)).toContain('digitos');
+        expect(normalizarTexto(mensajeValidacion)).toContain('exactamente');
 
 
         // NSS valido (correcto)
@@ -339,13 +343,14 @@ describe('CP #9 - Póliza de Seguro del Alumno no válida', () => {
         await registrarAlumnoPage.asignarPolizaSeguroAlumno(polizaNoValida);
         let mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.polizaAlumnoField);
         expect(normalizarTexto(mensajeValidacion)).toContain('formato');
-        expect(normalizarTexto(mensajeValidacion)).toContain('11');
+        expect(normalizarTexto(mensajeValidacion)).toContain('solo acepta');
+        expect(normalizarTexto(mensajeValidacion)).toContain('numeros');
 
 
         // Poliza valida (correcta)
         await registrarAlumnoPage.asignarPolizaSeguroAlumno(polizaNoValida);
         mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.nssAlumnoField);
-        expect(normalizarTexto(mensajeValidacion)).toContain('');
+        expect(normalizarTexto(mensajeValidacion)).toBe('');
 
 
         expect(mensajeValidacion).not.toBeNull();
@@ -476,6 +481,9 @@ describe('CP #13 - Fecha de Nacimiento del Tutor no válida (Debe tener 18 años
         await registrarAlumnoPage.open();
 
         await registrarAlumnoPage.asignarFechaNacimientoTutor(fechaInvalidaMenor);
+
+        await registrarAlumnoPage.driver.sleep(500);
+
         let mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(
             registrarAlumnoPage.fechaNacimientoTutorField
         );
@@ -484,10 +492,12 @@ describe('CP #13 - Fecha de Nacimiento del Tutor no válida (Debe tener 18 años
         expect(normalizarTexto(mensajeValidacion)).toContain('edad');
 
         await registrarAlumnoPage.asignarFechaNacimientoTutor(fechaValidaMayor);
+
+        await registrarAlumnoPage.driver.sleep(500);
+
         mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(
             registrarAlumnoPage.fechaNacimientoTutorField
         );
-
         expect(mensajeValidacion).toBeNull(); // NO debe haber mensaje de error
     });
 });
@@ -506,7 +516,7 @@ describe('CP #14 - Validar el número de teléfono del tutor', () => {
         registrarAlumnoPage = new RegistrarAlumnoPage(driver.driver);
     });
 
-    test('Verificar cuando se ingresa el documento del Acta de Nacimiento del alumno en el campo correspondiente, se notifique al usuario que dicho documento excede el tamaño aceptado por el sistema. Además de verificar que el formato del archivo es PDF.', async () => {
+    test('Verificar que el sistema valida que el número del teléfono del tutor no sea mayor a 10 dígitos o menor, y que no tenga caracteres especiales.', async () => {
 
         const telefonoInvalido = "644L01311";
 
@@ -519,15 +529,25 @@ describe('CP #14 - Validar el número de teléfono del tutor', () => {
             registrarAlumnoPage.telefonoTutorField
         );
 
+        mensajeValidacion = normalizarTexto(mensajeValidacion);
+
         expect(mensajeValidacion).not.toBeNull();
         expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+        expect(normalizarTexto(mensajeValidacion)).toContain('telefono');
+        expect(normalizarTexto(mensajeValidacion)).toContain('debe ser');
+        expect(normalizarTexto(mensajeValidacion)).toContain('10');
+        expect(normalizarTexto(mensajeValidacion)).toContain('digitos');
+
 
         await registrarAlumnoPage.asignarNumeroTelefonoTutor(telefonoCorrecto)
         mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(
             registrarAlumnoPage.telefonoTutorField
         );
 
-        expect(mensajeValidacion).toBeNull();
+        mensajeValidacion = normalizarTexto(mensajeValidacion);
+
+        expect(mensajeValidacion).not.toBeNull();
+        expect(mensajeValidacion).toBe('');
     });
 });
 
@@ -553,29 +573,38 @@ describe('CP #15 - Documento Acta de Nacimiento - Formato y Tamaño', () => {
         await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoInvalido);
         mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docActaNacimientoAlumnoField);
 
+        mensajeValidacion = normalizarTexto(mensajeValidacion);
+
         expect(mensajeValidacion).not.toBeNull();
-        expect(normalizarTexto(mensajeValidacion)).toContain('pdf');
-        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+        expect(mensajeValidacion).toContain('pdf');
+        expect(mensajeValidacion).toContain('documento');
+        expect(mensajeValidacion).toContain('formato');
+        expect(mensajeValidacion).toContain('acta de nacimiento');
+
 
         // prueba documento pesado PDF
         const rutaAbsolutaArchivoPesado = path.join(rutaRaiz, 'assets', 'documentos', 'pesados', 'DocumentoTestPesado_10mb.pdf');
         await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoPesado);
         mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docActaNacimientoAlumnoField);
 
+        mensajeValidacion = normalizarTexto(mensajeValidacion);
+
         expect(mensajeValidacion).not.toBeNull();
-        expect(normalizarTexto(mensajeValidacion)).toContain('pdf');
-        expect(normalizarTexto(mensajeValidacion)).toContain('formato');
+        expect(mensajeValidacion).toContain('el documento acta de nacimiento excede el tamano maximo de 10mb.');
 
         // prueba documento valido
         const rutaAbsolutaArchivoValido = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
         await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoValido);
+        mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docActaNacimientoAlumnoField);
+
+        mensajeValidacion = normalizarTexto(mensajeValidacion);
 
         let archivoCargado = await registrarAlumnoPage.driver
             .findElement(registrarAlumnoPage.docActaNacimientoAlumnoField)
             .getAttribute("value");
 
         expect(archivoCargado).not.toBeNull();
-        expect(normalizarTexto(archivoCargado)).toContain('pdf');
+        expect(mensajeValidacion).toBe('');
     });
 });
 
@@ -609,7 +638,7 @@ describe('CP #16 - Documento Certificado de Secundaria - Formato y Tamaño', () 
         mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docCertificadoSecundariaAlumnoField);
 
         expect(mensajeValidacion).not.toBeNull();
-        expect(normalizarTexto(mensajeValidacion)).toContain('pdf');
+        expect(normalizarTexto(mensajeValidacion)).toContain('el documento certificado de secundaria excede el tamano maximo de 10mb.');
 
         const rutaAbsolutaArchivoValido = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
         await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoValido);
@@ -622,7 +651,7 @@ describe('CP #16 - Documento Certificado de Secundaria - Formato y Tamaño', () 
         expect(normalizarTexto(archivoCargado)).toContain('pdf');
 
         mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docCertificadoSecundariaAlumnoField);
-        expect(mensajeValidacion).toBeNull();
+        expect(mensajeValidacion).toBe("");
     });
 });
 
@@ -667,7 +696,7 @@ describe('CP #17 - Documento CURP del Alumno - Formato y Tamaño', () => {
         expect(normalizarTexto(archivoCargado)).toContain('pdf');
 
         mensajeValidacion = await registrarAlumnoPage.getNativeValidationError(registrarAlumnoPage.docCURPAlumnoField);
-        expect(mensajeValidacion).toBeNull();
+        expect(mensajeValidacion).toBe("");
     });
 });
 
@@ -685,11 +714,13 @@ describe('CP #18 - Especificación de Condición Especial del Alumno', () => {
         await registrarAlumnoPage.toggleCondicionEspecialAlumno();
 
         let isVisible = await registrarAlumnoPage.isCondicionEspecialDescripcionVisible();
+        console.log("#visible: " + isVisible);
         expect(isVisible).toBe(true);
 
         await registrarAlumnoPage.toggleCondicionEspecialAlumno();
 
         isVisible = await registrarAlumnoPage.isCondicionEspecialDescripcionVisible();
+        console.log("#visible: " + isVisible);
         expect(isVisible).toBe(false);
     });
 });
@@ -764,7 +795,28 @@ describe('CP #21 - Problema de conexión al intentar Registrar Alumno', () => {
     test('Verificar que un fallo de conexión al intentar registrar genera un mensaje de error.', async () => {
         await registrarAlumnoPage.open();
 
-        await registrarAlumnoPage.llenarCamposDatosValidos(registrarAlumnoPage, rutaRaiz);
+        const rutaAbsolutaArchivoValidoPdf = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
+        const rutaAbsolutaArchivoValidoJpeg = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
+
+        await registrarAlumnoPage.asignarFotoAlumno(rutaAbsolutaArchivoValidoJpeg);
+        await registrarAlumnoPage.introducirDocumentoActaNacimientoAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCertificadoSecundariaAlumno(rutaAbsolutaArchivoValidoPdf);
+        await registrarAlumnoPage.introducirDocumentoCURPAlumno(rutaAbsolutaArchivoValidoPdf);
+
+        await registrarAlumnoPage.asignarMatriculaAlumno("19040042");
+        await registrarAlumnoPage.asignarCURPAlumno("EOLE049815HERRELA1");
+        await registrarAlumnoPage.asignarNombreAlumno("Carlos");
+        await registrarAlumnoPage.asignarApellidoPaternoAlumno("Perez");
+        await registrarAlumnoPage.asignarApellidoMaternoAlumno("Moreno");
+        await registrarAlumnoPage.asignarFechaNacimientoAlumno("2000-01-01");
+        //await registrarAlumnoPage.asignarNSSAlumno("01234567899");
+        //await registrarAlumnoPage.asignarPolizaSeguroAlumno("2474982004");
+
+        await registrarAlumnoPage.asignarNombreTutor("David");
+        await registrarAlumnoPage.asignarApellidoPaternoTutor("Sanchez");
+        await registrarAlumnoPage.asignarApellidoMaternoTutor("Lopez");
+        await registrarAlumnoPage.asignarNumeroTelefonoTutor("6444000000");
+        await registrarAlumnoPage.asignarFechaNacimientoTutor("1970-01-01");
 
         let mensajeValidacionPrevia = await registrarAlumnoPage.getNativeValidationError(
             registrarAlumnoPage.matriculaAlumnoField
@@ -974,7 +1026,7 @@ describe('CP #24 - Validación de campos contra inyecciones SQL', () => {
         const rutaAbsolutaArchivoValidoPdf = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
         const rutaAbsolutaArchivoValidoJpeg = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
 
-        await registrarAlumnoPage.asignarMatriculaAlumno("6502650665");
+        await registrarAlumnoPage.asignarMatriculaAlumno("65026506");
         await registrarAlumnoPage.asignarCURPAlumno("NETO049815HERRELA1");
 
         await registrarAlumnoPage.asignarNombreAlumno(SQL_INJECTION_STRING);
@@ -1036,7 +1088,7 @@ describe('CP #27 - Validación de CURP repetida', () => {
         const rutaAbsolutaArchivoValidoPdf = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
         const rutaAbsolutaArchivoValidoJpeg = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
 
-        await registrarAlumnoPage.asignarMatriculaAlumno("8229220221");
+        await registrarAlumnoPage.asignarMatriculaAlumno("82292202");
         await registrarAlumnoPage.asignarCURPAlumno("EOLE049815HERRELA1");
         await registrarAlumnoPage.asignarNombreAlumno("Carlos");
         await registrarAlumnoPage.asignarApellidoPaternoAlumno("Perez");
@@ -1115,7 +1167,7 @@ describe('CP #28 - Prevención de Envío Múltiple (Doble Clic) del Formulario',
         const rutaAbsolutaArchivoValidoPdf = path.join(rutaRaiz, 'assets', 'documentos', 'validos', 'DocumentoTest_No_10mb.pdf');
         const rutaAbsolutaArchivoValidoJpeg = path.join(rutaRaiz, 'assets', 'archivo_valido.jpeg');
 
-        await registrarAlumnoPage.asignarMatriculaAlumno("9800760054");
+        await registrarAlumnoPage.asignarMatriculaAlumno("98007600");
         await registrarAlumnoPage.asignarCURPAlumno("CLKO049815HERRELA1");
         await registrarAlumnoPage.asignarNombreAlumno("Carlos");
         await registrarAlumnoPage.asignarApellidoPaternoAlumno("Perez");
