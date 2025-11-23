@@ -112,11 +112,24 @@ class RegistrarAlumnoPage {
     }
 
     async asignarNumeroTelefonoTutor(telefono) {
-        await this.driver.findElement(this.telefonoTutorField).sendKeys(telefono);
+        const element = this.driver.findElement(this.telefonoTutorField);
+        element.clear();
+        element.sendKeys(telefono);
     }
 
     async asignarFechaNacimientoTutor(fechaNacimiento) {
-        await this.driver.findElement(this.fechaNacimientoTutorField).sendKeys(fechaNacimiento);
+        const element = await this.driver.findElement(this.fechaNacimientoTutorField);
+        await element.clear();
+
+        await this.driver.executeScript("arguments[0].value = arguments[1];", element, fechaNacimiento);
+
+        // 2. Disparar eventos MÚLTIPLES para despertar al navegador
+        // Algunos frameworks escuchan 'input', otros 'change', otros 'blur'. Disparamos todos.
+        await this.driver.executeScript(`
+            arguments[0].dispatchEvent(new Event('input', { bubbles: true }));
+            arguments[0].dispatchEvent(new Event('change', { bubbles: true }));
+            arguments[0].dispatchEvent(new Event('blur', { bubbles: true }));
+        `, element);
     }
 
     async introducirDocumentoActaNacimientoAlumno(rutaActaNacimiento) {
@@ -212,6 +225,15 @@ class RegistrarAlumnoPage {
         }
     }
 
+    /**
+     * Limpia explícitamente el respaldo de datos del LocalStorage.
+     * La clave 'registroAlumnoData' fue la utilizada para guardar los datos del formulario.
+     * @returns {Promise<void>}
+     */
+    async clearLocalStorageBackup() {
+        await this.driver.executeScript(`window.localStorage.removeItem('registroAlumnoData');`);
+    }
+
     async llenarCamposExceptoDocumentos(registrarAlumnoPage) {
 
         // Datos Válidos para Alumno (pasando CP #2 a #14)
@@ -266,14 +288,26 @@ class RegistrarAlumnoPage {
      * Esto funciona para inputs con required, type="email", etc.
      */
     async getNativeValidationError(locator) {
+
+
+        const element = await this.driver.findElement(locator);
+
+        // 1. Forzar la visualización de la burbuja nativa ANTES de leerla
+        // La validación ya se ejecutó con el evento 'change', esto solo la muestra/actualiza.
+        await this.driver.executeScript("arguments[0].reportValidity();", element);
+
+        // 2. Leer el mensaje
+        return element.getAttribute('validationMessage');
+        /*
         const element = await this.driver.findElement(locator);
         const validationMessage = await this.driver.executeScript(
             // El script usa el API de validación nativa del elemento DOM
             'return arguments[0].validationMessage;',
             element // Pasa el elemento de Selenium como argumento[0]
         );
-
         return validationMessage;
+
+         */
     }
 
     /**
