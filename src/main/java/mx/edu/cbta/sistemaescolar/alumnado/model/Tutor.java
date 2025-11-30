@@ -2,16 +2,21 @@ package mx.edu.cbta.sistemaescolar.alumnado.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.time.LocalDate;
 import java.util.Set; // <-- Importado
 
 @Data
 @Entity
 @Table(name="tutores_alumnos")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Tutor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name="nombre", nullable = false, length = 50)
@@ -31,5 +36,6 @@ public class Tutor {
 
     // Relación inversa: Un tutor puede tener varios alumnos
     @OneToMany(mappedBy = "tutorLegal")
+    @ToString.Exclude
     private Set<Alumno> alumnos;
 }

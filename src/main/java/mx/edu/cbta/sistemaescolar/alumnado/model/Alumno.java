@@ -1,5 +1,7 @@
 package mx.edu.cbta.sistemaescolar.alumnado.model;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import mx.edu.cbta.sistemaescolar.academica.model.AlumnoInscrito;
 import mx.edu.cbta.sistemaescolar.personal.model.Docente;
 import jakarta.persistence.*;
@@ -11,10 +13,12 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name="alumnos")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Alumno {
 
     @Id
     @Column(name="matricula", length = 20)
+    @EqualsAndHashCode.Include
     private String matricula;
 
     @Column(name="curp", nullable = false, length = 20, unique = true)
@@ -56,18 +60,22 @@ public class Alumno {
     // CascadeType.ALL hará que el Tutor se guarde automáticamente cuando se guarde el Alumno
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "tutor_legal_id")
+    @ToString.Exclude
     private Tutor tutorLegal;
 
     // Relación con Tutor Académico (Docente) - Se mantiene null al crear
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tutor_academico_id")
+    @ToString.Exclude
     private Docente tutorAcademico;
 
     // Relación con sus documentos
     @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private Set<DocumentoAlumno> documentos;
 
     // Relación con sus inscripciones a grupos
     @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private Set<AlumnoInscrito> inscripciones;
 }

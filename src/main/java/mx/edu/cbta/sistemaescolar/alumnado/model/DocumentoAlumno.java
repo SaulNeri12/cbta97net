@@ -2,6 +2,9 @@ package mx.edu.cbta.sistemaescolar.alumnado.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -9,14 +12,17 @@ import java.time.LocalDateTime;
 @Table(name="documentos_alumnos", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"alumno_matricula", "tipo"})
 })
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class DocumentoAlumno {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alumno_matricula", nullable = false)
+    @ToString.Exclude
     private Alumno alumno;
 
     @Enumerated(EnumType.STRING)
