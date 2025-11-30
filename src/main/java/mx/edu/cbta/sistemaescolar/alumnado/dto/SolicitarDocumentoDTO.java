@@ -1,4 +1,4 @@
-package mx.edu.cbta.sistemaescolar.Solicitud.dto;
+package mx.edu.cbta.sistemaescolar.alumnado.dto;
 
 import lombok.Data;
 

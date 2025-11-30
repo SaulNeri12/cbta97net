@@ -1,20 +1,19 @@
-package mx.edu.cbta.sistemaescolar.Solicitud.controller.exception;
-
-
-import mx.edu.cbta.sistemaescolar.Solicitud.service.exception.AlumnoNoEncontradoException;
+package mx.edu.cbta.sistemaescolar.alumnado.controller.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import java.io.IOException;
 import java.util.Map;
 
-@RestControllerAdvice(basePackages = "mx.edu.cbta.sistemaescolar.solicitud.controller")
-public class SolicitarAlumnoExceptionHandler {
+import mx.edu.cbta.sistemaescolar.alumnado.service.exception.AlumnoNoEncontradoException;
 
-    @ExceptionHandler(AlumnoNoEncontradoException.class) // <-- Esta línea ahora funciona
+
+@RestControllerAdvice(basePackages = "mx.edu.cbta.sistemaescolar.alumnado.controller")
+public class AlumnoExceptionHandler {
+
+    @ExceptionHandler(AlumnoNoEncontradoException.class)
     public ResponseEntity<Map<String, String>> handleAlumnoNoEncontrado(AlumnoNoEncontradoException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
     }
