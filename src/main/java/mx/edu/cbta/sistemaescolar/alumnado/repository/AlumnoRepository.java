@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface AlumnoRepository extends JpaRepository<Alumno, String> {
-
     Optional<Alumno> findByCurp(String curp);
+    Alumno findByMatricula(String matricula);
 }

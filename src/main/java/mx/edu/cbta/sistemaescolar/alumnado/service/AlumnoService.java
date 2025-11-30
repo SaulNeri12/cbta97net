@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AlumnoService {
-    Optional<Alumno> obtenerAlumnoPorMatricula(String matricula);
+    Alumno obtenerAlumnoPorMatricula(String matricula);
 
     // Cambiado a DTO
-    Alumno registrarAlumno(AlumnoDTO alumnoDTO);
+    Alumno registrarAlumno(Alumno alumno);
 
     // Cambiado a DTO
-    Alumno actualizarAlumno(String matricula, AlumnoDTO alumnoDTO);
+    Alumno actualizarAlumno(AlumnoDTO alumno);
 
     void eliminarAlumno(String matricula);
 

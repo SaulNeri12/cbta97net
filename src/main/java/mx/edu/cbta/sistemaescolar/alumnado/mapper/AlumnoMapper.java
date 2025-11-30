@@ -2,27 +2,77 @@ package mx.edu.cbta.sistemaescolar.alumnado.mapper;
 
 import mx.edu.cbta.sistemaescolar.alumnado.dto.AlumnoDTO;
 import mx.edu.cbta.sistemaescolar.alumnado.model.Alumno;
+import mx.edu.cbta.sistemaescolar.alumnado.model.DocumentoAlumno;
+import mx.edu.cbta.sistemaescolar.personal.mapper.DocenteMapper;
+
+import mx.edu.cbta.sistemaescolar.alumnado.dto.SolicitarAlumnoDetalleDTO;
+import mx.edu.cbta.sistemaescolar.alumnado.dto.SolicitarDocumentoDTO;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring", uses = {TutorMapper.class}) // <-- AÑADIDO TutorMapper
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Mapper(componentModel = "spring", uses = {
+        TutorMapper.class,
+        DocenteMapper.class
+})
 public abstract class AlumnoMapper {
 
     @Mappings({
-            // Mapea el DTO anidado 'tutorLegal' al objeto de entidad 'tutorLegal'
+            @Mapping(source = "matricula", target = "matricula"),
+            @Mapping(source = "curp", target = "curp"),
+            @Mapping(source = "nombre", target = "nombre"),
+            @Mapping(source = "apellidoPaterno", target = "apellidoPaterno"),
+            @Mapping(source = "apellidoMaterno", target = "apellidoMaterno"),
+            @Mapping(source = "fechaNacimiento", target = "fechaNacimiento"),
+            @Mapping(source = "numeroSeguroSocial", target = "numeroSeguroSocial"),
+            @Mapping(source = "numeroPolizaSeguro", target = "numeroPolizaSeguro"),
+            @Mapping(source = "condicionEspecial", target = "condicionEspecial"),
+            @Mapping(source = "condicionEspecialDescripcion", target = "condicionEspecialDescripcion"),
             @Mapping(source = "tutorLegal", target = "tutorLegal"),
-
-            // Ignoramos estas relaciones (tutorAcademico será null por defecto)
-            @Mapping(target = "tutorAcademico", ignore = true),
-            @Mapping(target = "documentos", ignore = true),
-            @Mapping(target = "inscripciones", ignore = true)
+            @Mapping(source = "tutorAcademico", target = "tutorAcademico"),
+            @Mapping(source = "documentos", target = "documentos", qualifiedByName = "buildDocumentosDTO")
+            // No mapeamos 'paraescolares'
     })
-    public abstract Alumno toEntity(AlumnoDTO dto);
+    public abstract SolicitarAlumnoDetalleDTO toDetalleDTO(Alumno entity);
 
     @Mappings({
-            // Mapeo inverso
-            @Mapping(source = "tutorLegal", target = "tutorLegal")
+            @Mapping(source = "matricula", target = "matricula"),
+            @Mapping(source = "curp", target = "curp"),
+            @Mapping(source = "nombre", target = "nombre"),
+            @Mapping(source = "apellidoPaterno", target = "apellidoPaterno"),
+            @Mapping(source = "apellidoMaterno", target = "apellidoMaterno"),
+            @Mapping(source = "fechaNacimiento", target = "fechaNacimiento"),
+            @Mapping(source = "numeroSeguroSocial", target = "numeroSeguroSocial"),
+            @Mapping(source = "numeroPolizaSeguro", target = "numeroPolizaSeguro"),
+            @Mapping(source = "condicionEspecial", target = "condicionEspecial"),
+            @Mapping(source = "condicionEspecialDescripcion", target = "condicionEspecialDescripcion"),
+            @Mapping(source = "tutorLegal", target = "tutorLegal"), // Asume que TutorMapper.toEntity(TutorDTO) existe
+            @Mapping(target = "documentos", ignore = true),         // Se manejan en el servicio/relación
+            @Mapping(target = "inscripciones", ignore = true),      // Se manejan en el servicio/relación
+            @Mapping(target = "tutorAcademico", ignore = true)      // Se establece a null por defecto, manejado en el servicio
     })
-    public abstract AlumnoDTO toDTO(Alumno entity);
+    public abstract Alumno toEntity(AlumnoDTO alumnoDTO);
+
+    @Named("buildDocumentosDTO")
+    protected Set<SolicitarDocumentoDTO> buildDocumentosDTO(Set<DocumentoAlumno> documentos) {
+        if (documentos == null) {
+            return null;
+        }
+        return documentos.stream().map(doc -> {
+            SolicitarDocumentoDTO dto = new SolicitarDocumentoDTO();
+            dto.setTipoDocumento(doc.getTipoDocumento().name());
+            dto.setNombreOriginal(doc.getNombreOriginal());
+
+            String url = String.format("/alumnos/%s/documentos?tipo=%s",
+                    doc.getAlumno().getMatricula(),
+                    doc.getTipoDocumento().name());
+            dto.setUrlDescarga(url);
+            return dto;
+        }).collect(Collectors.toSet());
+    }
 }

@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             // Llamamos al nuevo endpoint en el nuevo controlador
-            const response = await fetch(`${httpBase}/solicitar-alumno/${matricula}`);
+            const response = await fetch(`${httpBase}/alumnos/${matricula}`);
 
             if (!response.ok) {
                 const err = await response.json();

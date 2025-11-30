@@ -1,4 +1,4 @@
-package mx.edu.cbta.sistemaescolar.Solicitud.service.exception;
+package mx.edu.cbta.sistemaescolar.alumnado.service.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

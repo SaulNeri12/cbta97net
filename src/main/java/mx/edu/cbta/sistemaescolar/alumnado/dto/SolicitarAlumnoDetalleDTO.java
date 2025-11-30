@@ -1,8 +1,7 @@
-package mx.edu.cbta.sistemaescolar.Solicitud.dto;
+package mx.edu.cbta.sistemaescolar.alumnado.dto;
 
 import lombok.Data;
 // Importamos los DTOs de los otros paquetes que sí reutilizamos
-import mx.edu.cbta.sistemaescolar.alumnado.dto.TutorDTO;
 import mx.edu.cbta.sistemaescolar.personal.dto.DocenteDTO;
 
 import java.time.LocalDate;
