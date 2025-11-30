@@ -1,6 +1,8 @@
 package mx.edu.cbta.sistemaescolar.alumnado.controller;
 
 import mx.edu.cbta.sistemaescolar.alumnado.dto.AlumnoDTO;
+import mx.edu.cbta.sistemaescolar.alumnado.dto.SolicitarAlumnoDetalleDTO;
+import mx.edu.cbta.sistemaescolar.alumnado.mapper.AlumnoMapper;
 import mx.edu.cbta.sistemaescolar.alumnado.model.Alumno;
 import mx.edu.cbta.sistemaescolar.alumnado.model.DocumentoAlumno;
 import mx.edu.cbta.sistemaescolar.alumnado.model.TipoDocumentoAlumno;
@@ -23,11 +25,22 @@ import java.util.Optional;
 public class AlumnoController {
 
     private final AlumnoService alumnoService;
+    private final AlumnoMapper alumnoMapper;
     private final DocumentoAlumnoService documentoService;
 
-    public AlumnoController(AlumnoService alumnoService, DocumentoAlumnoService documentoService) {
+    public AlumnoController(AlumnoService alumnoService, DocumentoAlumnoService documentoService, AlumnoMapper alumnoMapper) {
         this.alumnoService = alumnoService;
         this.documentoService = documentoService;
+        this.alumnoMapper = alumnoMapper;
+    }
+
+    @GetMapping("/{matricula}")
+    public ResponseEntity<SolicitarAlumnoDetalleDTO> obtenerAlumnoPorMatricula(@PathVariable String matricula) {
+        Alumno alumno = this.alumnoService.obtenerAlumnoPorMatricula(matricula);
+
+        SolicitarAlumnoDetalleDTO alumnoDTO = this.alumnoMapper.toDetalleDTO(alumno);
+
+        return ResponseEntity.ok(alumnoDTO);
     }
 
     /**
@@ -36,8 +49,8 @@ public class AlumnoController {
      */
     @PostMapping
     public ResponseEntity<Alumno> registrarAlumno(@RequestBody AlumnoDTO alumnoDTO) {
-        // La excepción AlumnoException será capturada por AlumnadoExceptionHandler
-        Alumno alumnoRegistrado = alumnoService.registrarAlumno(alumnoDTO);
+        Alumno alumno = this.alumnoMapper.toEntity(alumnoDTO);
+        Alumno alumnoRegistrado = alumnoService.registrarAlumno(alumno);
         return ResponseEntity.status(HttpStatus.CREATED).body(alumnoRegistrado);
     }
 
