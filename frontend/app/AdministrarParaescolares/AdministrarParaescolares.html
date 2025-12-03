@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Paraescolares - CBTANet</title>
+    <link rel="stylesheet" href="AdministrarParaescolares.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="main-container">
+    <header class="module-header">
+        <h1>Administrar Paraescolares</h1>
+        <button id="btnNuevoParaescolar" class="btn btn-primary">
+            + Nueva Actividad
+        </button>
+    </header>
+
+    <div class="table-container">
+        <table id="tablaParaescolares">
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Horario</th>
+                <th>Cupo Máximo</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="cuerpoTabla">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="modalFormulario" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" id="closeModalForm">&times;</span>
+        <h2 id="tituloModal">Nueva Actividad Paraescolar</h2>
+
+        <form id="formParaescolar">
+            <input type="hidden" id="paraescolarId">
+
+            <div class="form-group">
+                <label for="nombre">Nombre de la Actividad *</label>
+                <input type="text" id="nombre" required placeholder="Ej. Fútbol Varonil">
+            </div>
+
+            <div class="form-group">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" rows="3" placeholder="Breve descripción de la actividad..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="horario">Horario *</label>
+                <input type="text" id="horario" required placeholder="Ej. Lunes y Miércoles 16:00 - 18:00">
+            </div>
+
+            <div class="form-group">
+                <label for="cupo">Cupo Máximo *</label>
+                <input type="number" id="cupo" required min="1" placeholder="Ej. 25">
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="btnCancelarForm">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalConfirmacion" class="modal">
+    <div class="modal-content small-modal">
+        <h2>Confirmar Eliminación</h2>
+        <p>¿Está seguro de eliminar esta actividad? Esta acción no se puede deshacer.</p>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="btnCancelarEliminar">Cancelar</button>
+            <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Eliminar</button>
+        </div>
+    </div>
+</div>
+
+<script src="AdministrarParaescolares.js"></script>
+</body>
+</html>
