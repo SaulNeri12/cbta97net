@@ -1,4 +1,4 @@
-package mx.edu.cbta.sistemaescolar.personal.service;
+package mx.edu.cbta.sistemaescolar.paraescolar.controller.service;
 
 import mx.edu.cbta.sistemaescolar.paraescolar.model.ActividadParaescolar;
 import mx.edu.cbta.sistemaescolar.paraescolar.repository.ActividadParaescolarRepository;

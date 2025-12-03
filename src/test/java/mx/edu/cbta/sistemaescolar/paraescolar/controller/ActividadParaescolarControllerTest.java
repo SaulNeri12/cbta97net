@@ -1,7 +1,6 @@
-package mx.edu.cbta.sistemaescolar.personal.controller;
+package mx.edu.cbta.sistemaescolar.paraescolar.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import mx.edu.cbta.sistemaescolar.paraescolar.controller.ActividadParaescolarController;
 import mx.edu.cbta.sistemaescolar.paraescolar.dto.ActividadParaescolarDTO;
 import mx.edu.cbta.sistemaescolar.paraescolar.mapper.ActividadParaescolarMapper;
 import mx.edu.cbta.sistemaescolar.paraescolar.model.ActividadParaescolar;
