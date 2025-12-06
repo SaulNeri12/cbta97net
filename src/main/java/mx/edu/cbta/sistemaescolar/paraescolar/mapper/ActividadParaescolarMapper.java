@@ -11,9 +11,7 @@ public interface ActividadParaescolarMapper {
 
     ActividadParaescolarMapper INSTANCE = Mappers.getMapper(ActividadParaescolarMapper.class);
 
-    // Ref: SD_Consultar Paso: toDTO(actividad)
     ActividadParaescolarDTO toDTO(ActividadParaescolar actividadParaescolar);
 
-    // Ref: SD_Crear Paso: toEntity(paraescolarDTO)
     ActividadParaescolar toEntity(ActividadParaescolarDTO actividadParaescolarDTO);
 }

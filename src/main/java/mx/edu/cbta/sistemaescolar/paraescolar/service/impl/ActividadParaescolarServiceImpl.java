@@ -1,5 +1,9 @@
 package mx.edu.cbta.sistemaescolar.paraescolar.service.impl;
 
+import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.ParaescolarNoEncontradaException;
+import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.ModificarParaescolarException;
+import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.CrearParaescolarException;
+
 import mx.edu.cbta.sistemaescolar.paraescolar.repository.ActividadParaescolarRepository;
 import mx.edu.cbta.sistemaescolar.paraescolar.service.ActividadParaescolarService;
 import mx.edu.cbta.sistemaescolar.paraescolar.model.ActividadParaescolar;
@@ -27,11 +31,11 @@ public class ActividadParaescolarServiceImpl implements ActividadParaescolarServ
 
     @Override
     @Transactional
-    public ActividadParaescolar crearActividadParaescolar(ActividadParaescolar paraescolar) {
+    public ActividadParaescolar crearActividadParaescolar(ActividadParaescolar paraescolar) throws CrearParaescolarException {
         Optional<ActividadParaescolar> existente = repository.findByNombre(paraescolar.getNombre());
 
         if (existente.isPresent()) {
-            throw new RuntimeException("La actividad paraescolar ya existe con ese nombre.");
+            throw new CrearParaescolarException("Ya existe otra actividad con ese nombre.");
         }
 
         return repository.save(paraescolar);
@@ -39,12 +43,14 @@ public class ActividadParaescolarServiceImpl implements ActividadParaescolarServ
 
     @Override
     @Transactional
-    public ActividadParaescolar modificarParaescolar(Long id, ActividadParaescolar paraescolarDatos) {
+    public ActividadParaescolar modificarParaescolar(Long id, ActividadParaescolar paraescolarDatos)
+            throws ParaescolarNoEncontradaException, ModificarParaescolarException
+    {
 
         ActividadParaescolar actividadEncontrada = obtenerParaescolarPorId(id);
 
         if (repository.existsByNombreAndIdNot(paraescolarDatos.getNombre(), id)) {
-            throw new RuntimeException("Ya existe otra actividad con este nombre.");
+            throw new ModificarParaescolarException("Ya existe otra actividad con ese nombre.");
         }
 
         actividadEncontrada.setNombre(paraescolarDatos.getNombre());
@@ -55,17 +61,17 @@ public class ActividadParaescolarServiceImpl implements ActividadParaescolarServ
 
     @Override
     @Transactional
-    public void eliminarParaescolar(Long id) {
+    public void eliminarParaescolar(Long id) throws ParaescolarNoEncontradaException {
         if (!repository.existsById(id)) {
-            throw new RuntimeException("Actividad no encontrada.");
+            throw new ParaescolarNoEncontradaException("Actividad paraescolar no encontrada.");
         }
 
         repository.deleteById(id);
     }
 
     @Override
-    public ActividadParaescolar obtenerParaescolarPorId(Long id) {
+    public ActividadParaescolar obtenerParaescolarPorId(Long id) throws ParaescolarNoEncontradaException {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Actividad Paraescolar no encontrada con id: " + id));
+                .orElseThrow(() -> new ParaescolarNoEncontradaException(String.format("No se encontró la actividad paraescolar con el ID especificado (ID: %d).", id)));
     }
 }
