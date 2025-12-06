@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -49,8 +51,10 @@ public class ActividadParaescolarController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminar(@PathVariable Long id) {
+    public ResponseEntity<?> eliminar(@PathVariable Long id) {
         service.eliminarParaescolar(id);
-        return ResponseEntity.ok("La actividad paraescolar ha sido eliminada con éxito.");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "La actividad paraescolar ha sido eliminada con éxito.");
+        return ResponseEntity.ok(response);
     }
 }

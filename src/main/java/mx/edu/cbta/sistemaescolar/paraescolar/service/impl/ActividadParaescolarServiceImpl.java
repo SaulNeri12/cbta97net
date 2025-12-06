@@ -49,8 +49,6 @@ public class ActividadParaescolarServiceImpl implements ActividadParaescolarServ
 
         actividadEncontrada.setNombre(paraescolarDatos.getNombre());
         actividadEncontrada.setDescripcion(paraescolarDatos.getDescripcion());
-        actividadEncontrada.setHorario(paraescolarDatos.getHorario());
-        actividadEncontrada.setCupoMaximo(paraescolarDatos.getCupoMaximo());
 
         return repository.save(actividadEncontrada);
     }
@@ -58,16 +56,9 @@ public class ActividadParaescolarServiceImpl implements ActividadParaescolarServ
     @Override
     @Transactional
     public void eliminarParaescolar(Long id) {
-        // Validar existencia primero
         if (!repository.existsById(id)) {
             throw new RuntimeException("Actividad no encontrada.");
         }
-
-        /*boolean tieneAlumnos = grupoParaescolarService.tieneAlumnosInscritosEnParaescolar(id);
-
-        if (tieneAlumnos) {
-            throw new RuntimeException("No se puede eliminar una paraescolar con alumnos activos");
-        }*/
 
         repository.deleteById(id);
     }
