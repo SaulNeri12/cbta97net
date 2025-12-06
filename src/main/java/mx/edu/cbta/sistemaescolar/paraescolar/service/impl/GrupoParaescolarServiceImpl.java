@@ -1,21 +1,21 @@
 package mx.edu.cbta.sistemaescolar.paraescolar.service.impl;
 
-import mx.edu.cbta.sistemaescolar.academica.model.Horario;
-import mx.edu.cbta.sistemaescolar.curricular.model.CicloEscolar;
-import mx.edu.cbta.sistemaescolar.curricular.service.CicloEscolarService;
+
 import mx.edu.cbta.sistemaescolar.curricular.service.exception.CicloEscolarNoEncontradoException;
-import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.CrearGrupoParaescolarException;
-import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.GrupoParaescolarNoEncontradoException;
 import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.ParaescolarNoEncontradaException;
+import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.CrearGrupoParaescolarException;
 import mx.edu.cbta.sistemaescolar.paraescolar.repository.GrupoParaescolarRepository;
 import mx.edu.cbta.sistemaescolar.paraescolar.service.ActividadParaescolarService;
 import mx.edu.cbta.sistemaescolar.paraescolar.service.GrupoParaescolarService;
-import mx.edu.cbta.sistemaescolar.paraescolar.model.ActividadParaescolar;
-import mx.edu.cbta.sistemaescolar.paraescolar.model.GrupoParaescolar;
-
-import mx.edu.cbta.sistemaescolar.personal.model.Docente;
-import mx.edu.cbta.sistemaescolar.personal.service.DocenteService;
 import mx.edu.cbta.sistemaescolar.personal.service.exception.DocenteException;
+import mx.edu.cbta.sistemaescolar.paraescolar.model.ActividadParaescolar;
+import mx.edu.cbta.sistemaescolar.curricular.service.CicloEscolarService;
+import mx.edu.cbta.sistemaescolar.paraescolar.model.GrupoParaescolar;
+import mx.edu.cbta.sistemaescolar.personal.service.DocenteService;
+import mx.edu.cbta.sistemaescolar.curricular.model.CicloEscolar;
+import mx.edu.cbta.sistemaescolar.academica.model.Horario;
+import mx.edu.cbta.sistemaescolar.personal.model.Docente;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -117,9 +117,7 @@ public class GrupoParaescolarServiceImpl implements GrupoParaescolarService {
         grupoParaescolar.setCicloEscolar(cicloActivo);
         grupoParaescolar.setDocente(instructor);
 
-        GrupoParaescolar grupoNuevo = this.grupoParaescolarRepository.save(grupoParaescolar);
-
-        return grupoNuevo;
+        return this.grupoParaescolarRepository.save(grupoParaescolar);
     }
 
     @Override

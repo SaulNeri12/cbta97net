@@ -1,7 +1,7 @@
 package mx.edu.cbta.sistemaescolar.paraescolar.service;
 
-import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.ModificarParaescolarException;
 import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.ParaescolarNoEncontradaException;
+import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.ModificarParaescolarException;
 import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.CrearParaescolarException;
 import mx.edu.cbta.sistemaescolar.paraescolar.model.ActividadParaescolar;
 

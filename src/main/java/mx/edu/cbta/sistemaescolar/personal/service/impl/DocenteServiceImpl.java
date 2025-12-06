@@ -1,32 +1,29 @@
 package mx.edu.cbta.sistemaescolar.personal.service.impl;
 
-import mx.edu.cbta.sistemaescolar.academica.model.Clase;
-import mx.edu.cbta.sistemaescolar.academica.model.Horario;
-import mx.edu.cbta.sistemaescolar.curricular.model.CicloEscolar;
-import mx.edu.cbta.sistemaescolar.curricular.service.CicloEscolarService;
 import mx.edu.cbta.sistemaescolar.curricular.service.exception.CicloEscolarNoEncontradoException;
+import mx.edu.cbta.sistemaescolar.personal.service.exception.DocenteException;
 import mx.edu.cbta.sistemaescolar.paraescolar.service.GrupoParaescolarService;
-import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.GrupoParaescolarNoEncontradoException;
-import mx.edu.cbta.sistemaescolar.personal.model.Docente;
+import mx.edu.cbta.sistemaescolar.curricular.service.CicloEscolarService;
 import mx.edu.cbta.sistemaescolar.personal.repository.DocenteRepository;
 import mx.edu.cbta.sistemaescolar.personal.service.DocenteService;
-import mx.edu.cbta.sistemaescolar.personal.service.exception.DocenteException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
+import mx.edu.cbta.sistemaescolar.curricular.model.CicloEscolar;
+import mx.edu.cbta.sistemaescolar.academica.model.Horario;
+import mx.edu.cbta.sistemaescolar.personal.model.Docente;
+import mx.edu.cbta.sistemaescolar.academica.model.Clase;
+
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.context.annotation.Lazy;
-
 @Service
 public class DocenteServiceImpl implements DocenteService {
 
-    private DocenteRepository docenteRepository;
-    private CicloEscolarService cicloEscolarService;
     private GrupoParaescolarService grupoParaescolarService;
+    private CicloEscolarService cicloEscolarService;
+    private DocenteRepository docenteRepository;
+
 
     public DocenteServiceImpl(DocenteRepository docenteRepository, CicloEscolarService cicloEscolarService, @Lazy GrupoParaescolarService grupoParaescolarService) {
         this.docenteRepository = docenteRepository;
@@ -54,9 +51,6 @@ public class DocenteServiceImpl implements DocenteService {
     @Override
     public boolean docenteDisponibleEnHorario(Long idDocente, Horario nuevoHorario) throws DocenteException {
         Docente docente = obtenerDocentePorId(idDocente);
-
-        // NOTE: Este metodo no deberia llamar al servicio de Grupos Paraescolares.
-        // Causara problemas despues (dependencia ciclica)
 
         CicloEscolar cicloVigente;
         try {

@@ -2,10 +2,10 @@ package mx.edu.cbta.sistemaescolar.paraescolar.controller.exception;
 
 import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.*;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
