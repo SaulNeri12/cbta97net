@@ -5,6 +5,8 @@ import mx.edu.cbta.sistemaescolar.academica.model.Horario;
 import mx.edu.cbta.sistemaescolar.curricular.model.CicloEscolar;
 import mx.edu.cbta.sistemaescolar.curricular.service.CicloEscolarService;
 import mx.edu.cbta.sistemaescolar.curricular.service.exception.CicloEscolarNoEncontradoException;
+import mx.edu.cbta.sistemaescolar.paraescolar.service.GrupoParaescolarService;
+import mx.edu.cbta.sistemaescolar.paraescolar.service.exception.GrupoParaescolarNoEncontradoException;
 import mx.edu.cbta.sistemaescolar.personal.model.Docente;
 import mx.edu.cbta.sistemaescolar.personal.repository.DocenteRepository;
 import mx.edu.cbta.sistemaescolar.personal.service.DocenteService;
@@ -17,16 +19,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.context.annotation.Lazy;
+
 @Service
 public class DocenteServiceImpl implements DocenteService {
 
-
     private DocenteRepository docenteRepository;
     private CicloEscolarService cicloEscolarService;
+    private GrupoParaescolarService grupoParaescolarService;
 
-    public DocenteServiceImpl(DocenteRepository docenteRepository, CicloEscolarService cicloEscolarService) {
+    public DocenteServiceImpl(DocenteRepository docenteRepository, CicloEscolarService cicloEscolarService, @Lazy GrupoParaescolarService grupoParaescolarService) {
         this.docenteRepository = docenteRepository;
         this.cicloEscolarService = cicloEscolarService;
+        this.grupoParaescolarService = grupoParaescolarService;
     }
 
     @Override
@@ -50,7 +55,9 @@ public class DocenteServiceImpl implements DocenteService {
     public boolean docenteDisponibleEnHorario(Long idDocente, Horario nuevoHorario) throws DocenteException {
         Docente docente = obtenerDocentePorId(idDocente);
 
-        // Obtener ciclo escolar activo
+        // NOTE: Este metodo no deberia llamar al servicio de Grupos Paraescolares.
+        // Causara problemas despues (dependencia ciclica)
+
         CicloEscolar cicloVigente;
         try {
             cicloVigente = cicloEscolarService.obtenerCicloEscolarActivo();
@@ -58,21 +65,24 @@ public class DocenteServiceImpl implements DocenteService {
             throw new DocenteException("No se pudo verificar la disponibilidad del docente debido a que no hay un ciclo escolar vigente.");
         }
 
-        Set<Clase> clasesDocente = docente.getClases();
+        boolean ocupadoCargaParaescolar = false;
 
-        // Si el docente no tiene clases, está disponible
-        if (clasesDocente == null || clasesDocente.isEmpty()) {
-            return true;
-        }
-
-        // Solo considerar clases del ciclo vigente
-        boolean ocupado = clasesDocente.stream()
-                .filter(clase -> cicloVigente.equals(clase.getGrupo().getCicloEscolar()))
-                .flatMap(clase -> clase.getHorarios().stream())
+        ocupadoCargaParaescolar = grupoParaescolarService.obtenerGruposParaescolaresActualesPorDocente(idDocente)
+                .stream()
+                .flatMap(grupo -> grupo.getHorarios().stream())
                 .anyMatch(horario -> horario.seEmpalmaCon(nuevoHorario));
 
-        // Si no hay empalmes → disponible
-        return !ocupado;
+        Set<Clase> clasesDocente = docente.getClases();
+
+        boolean ocupadoCargaCurricular = (clasesDocente != null && !clasesDocente.isEmpty()) ?
+                clasesDocente.stream()
+                        .filter(clase -> clase.getGrupo() != null && cicloVigente.equals(clase.getGrupo().getCicloEscolar()))
+                        .flatMap(clase -> clase.getHorarios() != null ? clase.getHorarios().stream() : java.util.stream.Stream.empty())
+                        // verifica si algun horario de sus clases del ciclo chocan con el nuevo.
+                        .anyMatch(horario -> horario.seEmpalmaCon(nuevoHorario))
+                : false;
+
+        return !ocupadoCargaCurricular && !ocupadoCargaParaescolar;
     }
 
 

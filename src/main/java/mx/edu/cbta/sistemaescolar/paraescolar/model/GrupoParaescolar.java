@@ -47,7 +47,7 @@ public class GrupoParaescolar {
      * JPA creará una tabla separada (ej. "clase_horarios") para gestionar esta relación.
      */
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "clase_horarios", joinColumns = @JoinColumn(name = "clase_id"))
+    @CollectionTable(name = "clase_horarios_paraescolar", joinColumns = @JoinColumn(name = "clase_id"))
     @AttributeOverride(name = "dia", column = @Column(name = "dia_semana"))
     private Set<Horario> horarios;
 }

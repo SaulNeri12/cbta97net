@@ -1,8 +1,7 @@
 package mx.edu.cbta.sistemaescolar.paraescolar.dto;
 
 import mx.edu.cbta.sistemaescolar.curricular.dto.CicloEscolarDTO;
-
-import mx.edu.cbta.sistemaescolar.personal.dto.DocenteDTO;
+import mx.edu.cbta.sistemaescolar.academica.model.Horario;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -37,4 +36,7 @@ public class GrupoParaescolarDTO {
     private DocenteDTO docente;
 
     private Set<String> alumnosInscritos;
+
+    @NotNull(message = "El horario del grupo es obligatorio.")
+    private Set<Horario> horarios;
 }
